@@ -1,0 +1,36 @@
+/* MenuButton */
+
+.@{prefix}-menubtn {
+  
+  &:active, &.@{prefix}-active, &.@{prefix}-active:hover {
+    color: @btn-text-hover;
+    background-color: @btn-bg-hover;
+    border-color: @btn-border-hover;
+  }
+}
+
+.@{prefix}-menubtn.@{prefix}-btn-small span {
+  font-size: @font-size - 2px;
+}
+
+.@{prefix}-menubtn.@{prefix}-fixed-width span {
+  display: inline-block;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  width: 90px;
+}
+
+.@{prefix}-menubtn.@{prefix}-fixed-width.@{prefix}-btn-small span {
+  width: 70px;
+}
+
+.@{prefix}-menubtn .@{prefix}-caret {
+  *margin-top: 6px;
+}
+
+// RTL
+
+.@{prefix}-rtl .@{prefix}-menubtn button {
+  direction: rtl;
+  text-align: right;
+}

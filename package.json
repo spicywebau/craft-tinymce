@@ -1,0 +1,25 @@
+{
+  "name": "craft-tinymce",
+  "version": "1.0.0",
+  "description": "Integrates the TinyMCE editor with Craft CMS",
+  "main": "src/main.js",
+  "repository": "https://github.com/spicywebau/craft-tinymce.git",
+  "author": "Spicy Web <info@spicyweb.com.au>",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/webpack"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "css-loader": "^0.28.4",
+    "extract-text-webpack-plugin": "^2.1.2",
+    "file-loader": "^0.11.2",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.4",
+    "style-loader": "^0.18.2",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.1.0"
+  }
+}

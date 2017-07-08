@@ -1,0 +1,36 @@
+// Menu
+
+.@{prefix}-menu {
+  position: absolute;
+  left: 0; top: 0;
+  .reset-gradient();
+  z-index: 1000;
+  padding: 0;
+  margin: @menu-margin; 
+  background: @menu-bg;
+  border: 0;
+  z-index: 1002;
+  border-radius: 3px;
+  max-height: 400px;
+  overflow: auto;
+  overflow-x: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 20, 0.1), 0 5px 20px rgba(0, 0, 0, 0.25);
+
+  > .@{prefix}-container-body {
+    min-width: 160px;
+  }
+}
+
+.@{prefix}-menu i {
+  display: none;
+}
+
+.@{prefix}-menu-has-icons i {
+  display: inline-block;
+  *display: inline;
+}
+
+.@{prefix}-menu-sub-tr-tl { margin: 0 0 0 -2px; }
+.@{prefix}-menu-sub-br-bl { margin: 0 0 0 -2px; }
+.@{prefix}-menu-sub-tl-tr { margin: 0 0 0 2px; }
+.@{prefix}-menu-sub-bl-br { margin: 0 0 0 2px; }
