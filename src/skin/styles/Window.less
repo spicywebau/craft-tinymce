@@ -12,15 +12,11 @@ div.@{prefix}-fullscreen {
 }
 
 #@{prefix}-modal-block {
-  .opacity(0);
   position: fixed;
   left: 0; top: 0;
   width: 100%; height: 100%;
-  background: @window-modalblock-bg;
-}
-
-#@{prefix}-modal-block.@{prefix}-in {
-  .opacity(@window-modalblock-opacity);
+  background: rgba(255, 255, 255, 0.75);
+  transition: none;
 }
 
 .@{prefix}-window-move {
@@ -28,19 +24,41 @@ div.@{prefix}-fullscreen {
 }
 
 .@{prefix}-window {
-  .border-radius(6px);
-  .box-shadow(@window-box-shadow);
-  .reset-gradient();
-  background: @window-bg;
+  background: white;
   position: fixed;
   top: 0; left: 0;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
   opacity: 0;
-  transform: scale(0.1);
-  transition: transform 100ms ease-in, opacity 150ms ease-in;
+  transition: opacity 150ms ease-in;
+
+  .@{prefix}-btn {
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 20, 0.1);
+    background-image: linear-gradient(#fff, #fafafa);
+
+    &.@{prefix}-active, &.@{prefix}-active:hover, &:not(.@{prefix}-disabled):active {
+      color: @btn-text;
+      background-image: linear-gradient(#e4e5e7, #eaebec);
+    }
+
+    &.@{prefix}-primary {
+      background-image: linear-gradient(#da5a47, #cc5643);
+
+      &.@{prefix}-active, &.@{prefix}-active:hover, &:not(.@{prefix}-disabled):active {
+        color: white;
+        background-image: linear-gradient(#8c3b2e, #994032);
+      }
+    }
+  }
+
+  &[aria-label="Source code"] .@{prefix}-textbox {
+    font-family: monospace;
+  }
 }
 
 .@{prefix}-window.@{prefix}-in {
-  transform: scale(1);
   opacity: 1;
 }
 
@@ -70,10 +88,11 @@ div.@{prefix}-fullscreen {
 
 .@{prefix}-window-head .@{prefix}-title {
   line-height: 20px;
-  font-size: @window-title-font-size;
+  font-size: @font-size;
   font-weight: bold;
   text-rendering: optimizelegibility;
   padding-right: 20px;
+  color: #576575;
 }
 
 .@{prefix}-window .@{prefix}-container-body {
@@ -83,8 +102,10 @@ div.@{prefix}-fullscreen {
 .@{prefix}-foot {
   display: block;
   background-color: @window-foot-bg;
-  border-top: 1px solid @window-foot-border;
-  .border-radius(0 0 6px 6px);
+  border: 0;
+  box-shadow: inset 0 2px 1px -2px rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(#ecedef, #e9eaec);
+  border-radius: 0 0 4px 4px;
 }
 
 .@{prefix}-window-head .@{prefix}-dragh {

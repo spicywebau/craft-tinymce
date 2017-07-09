@@ -3,7 +3,7 @@
 @import "Variables.less";
 
 body {
-  margin: 16px;
+  margin: 18px;
   background-color: @content-bg;
   color: @content-text;
   font-family: @content-font-family;
@@ -18,18 +18,30 @@ body {
   scrollbar-shadow-color: #F0F0EE;
   scrollbar-track-color: #F5F5F5;
 
-  > h1, > h2, > h3,
-  > h4, > h5, > h6,
-  > p, > ul, > ol {
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+}
 
-    &:first-child { margin-top: 0; }
-    &:last-child { margin-bottom: 0; }
-  }
+pre {
+  white-space: pre-wrap;
 }
 
 td, th {
   font-family: @content-font-family;
   font-size: @content-font-size;
+}
+
+hr {
+  display: block;
+  margin: 18px 0;
+  height: 1px;
+  border: 0;
+  background-color: #e3e5e8;
+}
+
+a {
+  color: @text-link;
+  text-decoration: underline;
 }
 
 @import "Mixins.less";

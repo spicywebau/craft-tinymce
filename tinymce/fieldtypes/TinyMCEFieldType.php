@@ -181,9 +181,10 @@ class TinyMCEFieldType extends BaseFieldType
 		$settings = [
 			'id' => craft()->templates->namespaceInputId($id),
 			'linkOptions' => $this->_getLinkOptions(),
-			'assetSources' => $this->_getAssetSources(),
+			'mediaOptions' => $this->_getMediaOptions(),
 			'transforms' => $this->_getTransforms(),
-			'language' => $locale->getLanguage($localeId),
+			'locale' => $localeId,
+			'language' => $locale->getLanguageID($localeId),
 			'direction' => $locale->getOrientation(),
 		];
 
@@ -278,6 +279,7 @@ class TinyMCEFieldType extends BaseFieldType
 
 		$sectionSources = $this->_getSectionSources();
 		$categorySources = $this->_getCategorySources();
+		$assetSources = $this->_getAssetSources();
 
 		if($sectionSources)
 		{
@@ -297,6 +299,15 @@ class TinyMCEFieldType extends BaseFieldType
 			];
 		}
 
+		if($assetSources)
+		{
+			$linkOptions[] = [
+				'optionTitle' => Craft::t("Link to an asset"),
+				'elementType' => 'Asset',
+				'sources' => $assetSources,
+			];
+		}
+
 		// Give plugins a chance to add their own
 		$allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
 
@@ -306,6 +317,32 @@ class TinyMCEFieldType extends BaseFieldType
 		}
 
 		return $linkOptions;
+	}
+
+	private function _getMediaOptions()
+	{
+		$mediaOptions = [];
+
+		$assetSources = $this->_getAssetSources();
+
+		if($assetSources)
+		{
+			$mediaOptions[] = [
+				'optionTitle' => Craft::t("Insert an asset"),
+				'elementType' => 'Asset',
+				'sources' => $assetSources,
+			];
+		}
+
+		// Give plugins a chance to add their own
+		$allPluginMediaOptions = craft()->plugins->call('addRichTextMediaOptions', [], true);
+
+		foreach($allPluginMediaOptions as $pluginMediaOptions)
+		{
+			$mediaOptions = array_merge($mediaOptions, $pluginMediaOptions);
+		}
+
+		return $mediaOptions;
 	}
 
 	private function _getSectionSources()

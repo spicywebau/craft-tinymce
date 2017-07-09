@@ -1,23 +1,27 @@
 // TextBox
 
 .@{prefix}-textbox {
-  background: @textbox-bg;
-  border: 1px solid @textbox-border;
-  .border-radius(3px);
-  .box-shadow(@textbox-box-shadow);
+  background: white;
+  border: 1px solid #e3e5e8;
+  border-radius: 3px;
   display: inline-block;
-  .transition(~"border linear .2s, box-shadow linear .2s");
-  height: 28px;
   resize: none;
-  padding: 0 4px 0 4px;
+  padding: 5px 7px;
   white-space: pre-wrap;
   *white-space: pre;
   color: @text;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 30px;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  box-shadow: 0 0 5px rgba(51, 170, 255, 0);
+  transition: box-shadow linear 100ms;
 }
 
 .@{prefix}-textbox:focus, .@{prefix}-textbox.@{prefix}-focus {
-  border-color: @textbox-border-focus;
-  .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px fadeout(@textbox-border-focus, 15%));
+  border-color: #7dafe8;
+  box-shadow: 0 0 5px #80caff;
 }
 
 .@{prefix}-placeholder .@{prefix}-textbox {
@@ -25,12 +29,13 @@
 }
 
 .@{prefix}-textbox.@{prefix}-multiline {
-  padding: 4px;
   height: auto;
 }
 
 .@{prefix}-textbox.@{prefix}-disabled {
-  color: mix(@text, @textbox-bg, 40%);
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
 }
 
 // RTL

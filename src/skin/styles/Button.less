@@ -2,14 +2,12 @@
 
 .@{prefix}-btn {
   color: @btn-text;
-  border: 1px solid mix(rgb(red(@btn-border-right), green(@btn-border-right), blue(@btn-border-right)), @panel-bg, 30%);
-  border-color: @btn-border-top @btn-border-right @btn-border-bottom @btn-border-left;
+  border: 0;
   position: relative;
   text-shadow: @text-shadow;
 
   .inline-block();
   .border-radius(3px);
-  .box-shadow(@btn-box-shadow);
   .vertical-gradient(@btn-bg, @btn-bg-hlight);
 
   &:hover, &:focus {
@@ -21,7 +19,6 @@
   &.@{prefix}-disabled, &.@{prefix}-disabled:hover {
     color: @btn-text !important;
     background-color: @btn-bg !important;
-    border-color: @btn-border-top @btn-border-right @btn-border-bottom @btn-border-left !important;
 
     button {
       cursor: default;
@@ -65,34 +62,34 @@
 }
 
 .@{prefix}-primary {
-  color: @btn-primary-text;
-  border: 1px solid transparent;
+  color: white;
+  border: 0;
   border-color: @btn-primary-border;
-  .vertical-gradient(@btn-primary-bg, @btn-primary-bg-hlight);
+  background-image: linear-gradient(#da5a47, #cc5643);
 
   &:hover, &:focus {
-    .vertical-gradient(darken(@btn-primary-bg, 5%), darken(@btn-primary-bg-hlight, 5%));
-    border-color: @btn-primary-border-hover;
+    color: white;
+    background-image: linear-gradient(#bf503f, #b34b3b);
   }
 
   &.@{prefix}-disabled button, &.@{prefix}-disabled:hover button {
+    color: white;
     cursor: default;
-    .box-shadow(none);
     .opacity(@btn-box-disabled-opacity);
   }
 
   &.@{prefix}-active, &.@{prefix}-active:hover, &:not(.@{prefix}-disabled):active {
-    .vertical-gradient(darken(@btn-primary-bg, 10%), darken(@btn-primary-bg-hlight, 10%));
-    .box-shadow(@btn-box-shadow-active);
+    color: white;
+    background-image: linear-gradient(#8c3b2e, #994032);
+  }
+
+  .@{prefix}-txt {
+    font-weight: bold;
   }
 }
 
-.@{prefix}-primary button, .@{prefix}-primary button i {
-  color: @btn-primary-text;
-  text-shadow: 1px 1px @btn-primary-text-shadow;
-}
-
 .@{prefix}-btn .@{prefix}-txt {
+  padding: 0 4px;
   font-size: inherit;
   line-height: inherit;
   color: inherit;
