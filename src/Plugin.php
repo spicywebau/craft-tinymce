@@ -19,12 +19,15 @@ use yii\base\Event;
  */
 class Plugin extends BasePlugin
 {
+    public static ?Plugin $plugin = null;
+
     /**
      * @inheritdoc
      */
     public function init(): void
     {
         parent::init();
+        self::$plugin = $this;
 
         Event::on(
             Fields::class,

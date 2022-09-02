@@ -3,7 +3,16 @@
 namespace spicyweb\tinymce\fields;
 
 use Craft;
+use craft\base\ElementInterface;
+use craft\elements\Asset;
+use craft\elements\Category;
+use craft\elements\Entry;
+use craft\helpers\Html;
+use craft\helpers\Json;
 use craft\htmlfield\HtmlField;
+use craft\models\Section;
+use spicyweb\tinymce\assets\FieldAsset;
+use spicyweb\tinymce\Plugin;
 
 class TinyMCE extends HtmlField
 {
@@ -42,92 +51,6 @@ class TinyMCE extends HtmlField
     //     return [ AttributeType::String, 'column' => $settings->columnType ];
     // }
 
-    // public function prepValue($value)
-    // {
-    //     if($value)
-    //     {
-    //         $charset = craft()->templates->getTwig()->getCharset();
-    //         $value = new RichTextData($value, $charset);
-    //     }
-    //     else
-    //     {
-    //         $value = null;
-    //     }
-
-    //     return $value;
-    // }
-
-    // public function prepValueFromPost($value)
-    // {
-    //     if($value)
-    //     {
-    //         if($this->getSettings()->purifyHtml)
-    //         {
-    //             $purifier = new \CHtmlPurifier();
-    //             $purifier->setOptions($this->_getPurifierConfig());
-    //             $value = $purifier->purify($value);
-    //         }
-
-    //         if($this->getSettings()->cleanupHtml)
-    //         {
-    //             $allTags = [
-    //                 "strong", "em", "b", "i", "u", "a",
-    //                 "h1", "h2", "h3", "h4", "h5", "h6", "p",
-    //                 "div", "blockquote", "pre",
-    //             ];
-
-    //             // Remove forbidden tags
-    //             $tags = craft()->config->get('cleanupTags', 'tinymce');
-    //             $tags = is_array($tags) ? implode('|', $tags) : false;
-    //             if($tags)
-    //             {
-    //                 $value = preg_replace('/<(?:' . $tags . ')\b[^>]*>/', "", $value);
-    //                 $value = preg_replace('/<\/(?:' . $tags . ')>/', "", $value);
-    //             }
-
-    //             // Remove inline styles
-    //             if(craft()->config->get('cleanupInlineStyles', 'tinymce'))
-    //             {
-    //                 $value = preg_replace('/(<(?:' . implode('|', $allTags) . ')\b[^>]*)\s+style="[^"]*"/', '$1', $value);
-    //             }
-
-    //             // Remove empty tags
-    //             if(craft()->config->get('cleanupEmptyTags', 'tinymce'))
-    //             {
-    //                 $value = preg_replace('/<(' . implode('|', $allTags) . ')\s*><\/\1>/', '', $value);
-    //             }
-    //         }
-    //     }
-
-    //     // Find any element URLs and swap them with ref tags
-    //     $pattern = '/(href=|src=)([\'"])[^\'"#]+?(#[^\'"#]+)?(?:#|%23)(\w+):(\d+)(:' . HandleValidator::$handlePattern .' )?\2/';
-    //     $value = preg_replace_callback($pattern, function($matches)
-    //     {
-    //         $refTag = implode('', [ '{', $matches[4], ':', $matches[5], (!empty($matches[6]) ? $matches[6] : ':url'), '}' ]);
-    //         $hash = (!empty($matches[3]) ? $matches[3] : '');
-
-    //         if($hash)
-    //         {
-    //             // Make sure that the hash isn't actually part of the parsed URL
-    //             // (someone's Entry URL Format could be "#{slug}", etc.)
-    //             $url = craft()->elements->parseRefs($refTag);
-
-    //             if(mb_strpos($url, $hash) !== false)
-    //             {
-    //                 $hash = '';
-    //             }
-    //         }
-
-    //         return implode('', [ $matches[1], $matches[2], $refTag, $hash, $matches[2] ]);
-
-    //     }, $value);
-
-    //     // Encode any 4-byte UTF-8 characters.
-    //     $value = StringHelper::encodeMb4($value);
-
-    //     return $value;
-    // }
-
     // public function validate($value)
     // {
     //     $valid = true;
@@ -147,6 +70,9 @@ class TinyMCE extends HtmlField
     //     return $valid;
     // }
 
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml(): string
     {
         $volumeOptions = [];
@@ -182,140 +108,116 @@ class TinyMCE extends HtmlField
         ]);
     }
 
-    // public function getInputHtml($name, $value)
-    // {
-    //     $id = craft()->templates->formatInputId($name);
-    //     $localeId = (isset($this->element) ? $this->element->locale : craft()->language);
-    //     $locale = craft()->i18n->getLocaleData($localeId);
+    /**
+     * @inheritdoc
+     */
+    protected function inputHtml(mixed $value, ElementInterface $element = null): string
+    {
+        $view = Craft::$app->getView();
+        $view->registerAssetBundle(FieldAsset::class);
 
-    //     if($value instanceof RichTextData)
-    //     {
-    //         $value = $value->getRawContent();
-    //     }
+        $id = Html::id($this->handle);
+        $sitesService = Craft::$app->getSites();
+        $elementSite = $element ? $element->getSite() : $sitesService->getCurrentSite();
+        $siteId = $element?->siteId ?? Craft::$app->getSites()->getCurrentSite()->id;
+        $allSites = [];
 
-    //     if(strpos($value, '{') !== false)
-    //     {
-    //         // Preserve the ref tags with hashes {type:id:url} => {type:id:url}#type:id
-    //         $pattern = '/(href=|src=)([\'"])(\{(\w+\:\d+\:' . HandleValidator::$handlePattern . ')\})(#[^\'"#]+)?\2/';
-    //         $value = preg_replace_callback($pattern, function($matches)
-    //         {
-    //             return implode('', [
-    //                 $matches[1], $matches[2], $matches[3],
-    //                 (!empty($matches[5]) ? $matches[5] : ''),
-    //                 '#', $matches[4], $matches[2],
-    //             ]);
-    //         }, $value);
+        foreach ($sitesService->getAllSites(false) as $site) {
+            $allSites[$site->id] = $site->name;
+        }
 
-    //         // Now parse 'em
-    //         $value = craft()->elements->parseRefs($value);
-    //     }
+        $settings = [
+            'id' => $view->namespaceInputId($id),
+            'linkOptions' => [], // $this->_getLinkOptions(),
+            'mediaOptions' => [], // $this->_getVolumeKeys(),
+            // 'transforms' => $this->_getTransforms(),
+            // 'defaultTransform' => $defaultTransform,
+            'elementSiteId' => $elementSite->id,
+            'allSites' => $allSites,
+        ];
 
-    //     $settings = [
-    //         'id' => craft()->templates->namespaceInputId($id),
-    //         'linkOptions' => $this->_getLinkOptions(),
-    //         'mediaOptions' => $this->_getMediaOptions(),
-    //         'transforms' => $this->_getTransforms(),
-    //         'locale' => $localeId,
-    //         'language' => $locale->getLanguageID($localeId),
-    //         'direction' => $locale->getOrientation(),
-    //     ];
+        if ($this->translationMethod != self::TRANSLATION_METHOD_NONE) {
+            // Explicitly set the text direction
+            $locale = Craft::$app->getI18n()->getLocaleById($elementSite->language);
+            $settings['direction'] = $locale->getOrientation();
+        }
 
-    //     $apiKey = craft()->config->get('editorCloudApiKey', 'tinymce');
-    //     if($apiKey)
-    //     {
-    //         $libraryDir = 'https://cloud.tinymce.com/stable/';
-    //         $libraryQuery = '?apiKey=' . $apiKey;
+        // $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
+        // if ($apiKey) {
+        //     $libraryDir = 'https://cloud.tinymce.com/stable/';
+        //     $libraryQuery = '?apiKey=' . $apiKey;
 
-    //         craft()->templates->includeJsFile($libraryDir . 'tinymce.min.js' . $libraryQuery);
-    //     }
-    //     else
-    //     {
-    //         craft()->templates->includeJsResource('tinymce/tinymce/tinymce.min.js');
-    //     }
+        //     $view->registerJsFile($libraryDir . 'tinymce.min.js' . $libraryQuery);
+        // } else {
+        //     craft()->templates->includeJsResource('tinymce/tinymce/tinymce.min.js');
+        // }
 
-    //     craft()->templates->includeJsResource('tinymce/input.js');
-    //     craft()->templates->includeJs('initTinyMCE(' . JsonHelper::encode($settings) . ');');
+        $view->registerAssetBundle(FieldAsset::class);
+        $view->registerJs('initTinyMCE(' . Json::encode($settings) . ');');
+        $value = $this->prepValueForInput($value, $element);
 
-    //     return implode('', [
-    //         '<textarea id="' . $id . '" name="' . $name . '" style="visibility: hidden; position: fixed; top: -9999px">',
-    //             htmlentities($value, ENT_NOQUOTES, 'UTF-8'),
-    //         '</textarea>',
-    //     ]);
-    // }
+        return implode('', [
+            '<textarea id="' . $id . '" name="' . $this->handle . '" style="visibility: hidden; position: fixed; top: -9999px">',
+                htmlentities($value, ENT_NOQUOTES, 'UTF-8'),
+            '</textarea>',
+        ]);
+    }
 
-    // public function getStaticHtml($value)
-    // {
-    //     return implode('', [
-    //         '<div class="text">',
-    //             ($value ? $value : '&nbsp;'),
-    //         '</div>',
-    //     ]);
-    // }
+    /**
+     * @inheritdoc
+     */
+    public function getStaticHtml(mixed $value, ElementInterface $element): string
+    {
+        return implode('', [
+            '<div class="text">',
+                ($this->prepValueForInput($value, $element) ?: '&nbsp;'),
+            '</div>',
+        ]);
+    }
 
-    // private function _getPurifierConfig()
-    // {
-    //     $settings = [
-    //         'Attr.AllowedFrameTargets' => [ '_blank' ],
-    //         'HTML.AllowedComments' => [ 'pagebreak' ],
-    //     ];
+    private function _getLinkOptions(): array
+    {
+        $linkOptions = [];
 
-    //     $file = $this->getSettings()->purifierConfig;
-    //     $path = craft()->path->getConfigPath() . 'htmlpurifier/' . $file;
+        $sectionSources = $this->_getSectionSources();
+        $categorySources = $this->_getCategorySources();
+        // $assetSources = $this->_getAssetSources();
 
-    //     if($file && IOHelper::fileExists($path))
-    //     {
-    //         $json = IOHelper::getFileContents($path);
-    //         $settings = JsonHelper::decode($json);
-    //     }
+        if (!empty($sectionSources)) {
+            $linkOptions[] = [
+                'optionTitle' => Craft::t('tinymce', 'Link to an entry'),
+                'elementType' => Entry::class,
+                'refHandle' => Entry::refHandle(),
+                'sources' => $sectionSources,
+            ];
+        }
 
-    //     return $settings;
-    // }
+        if (!empty($categorySources)) {
+            $linkOptions[] = [
+                'optionTitle' => Craft::t('tinymce', 'Link to a category'),
+                'elementType' => Category::class,
+                'sources' => $categorySources,
+            ];
+        }
 
-    // private function _getLinkOptions()
-    // {
-    //     $linkOptions = [];
+        // if (!empty($assetSources)) {
+        //     $linkOptions[] = [
+        //         'optionTitle' => Craft::t('tinymce', 'Link to an asset'),
+        //         'elementType' => Asset::class,
+        //         'sources' => $assetSources,
+        //     ];
+        // }
 
-    //     $sectionSources = $this->_getSectionSources();
-    //     $categorySources = $this->_getCategorySources();
-    //     $assetSources = $this->_getAssetSources();
+        // Give plugins a chance to add their own
+        $allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
 
-    //     if($sectionSources)
-    //     {
-    //         $linkOptions[] = [
-    //             'optionTitle' => Craft::t("Link to an entry"),
-    //             'elementType' => 'Entry',
-    //             'sources' => $sectionSources,
-    //         ];
-    //     }
+        foreach($allPluginLinkOptions as $pluginLinkOptions)
+        {
+            $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
+        }
 
-    //     if($categorySources)
-    //     {
-    //         $linkOptions[] = [
-    //             'optionTitle' => Craft::t("Link to a category"),
-    //             'elementType' => 'Category',
-    //             'sources' => $categorySources,
-    //         ];
-    //     }
-
-    //     if($assetSources)
-    //     {
-    //         $linkOptions[] = [
-    //             'optionTitle' => Craft::t("Link to an asset"),
-    //             'elementType' => 'Asset',
-    //             'sources' => $assetSources,
-    //         ];
-    //     }
-
-    //     // Give plugins a chance to add their own
-    //     $allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
-
-    //     foreach($allPluginLinkOptions as $pluginLinkOptions)
-    //     {
-    //         $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
-    //     }
-
-    //     return $linkOptions;
-    // }
+        return $linkOptions;
+    }
 
     // private function _getMediaOptions()
     // {
@@ -343,47 +245,40 @@ class TinyMCE extends HtmlField
     //     return $mediaOptions;
     // }
 
-    // private function _getSectionSources()
-    // {
-    //     $sources = [];
-    //     $sections = craft()->sections->getAllSections();
-    //     $showSingles = false;
+    private function _getSectionSources(): array
+    {
+        $sources = [];
+        $sections = Craft::$app->getSections()->getAllSections();
+        $showSingles = false;
 
-    //     foreach($sections as $section)
-    //     {
-    //         if($section->type == SectionType::Single)
-    //         {
-    //             $showSingles = true;
-    //         }
-    //         else if($section->hasUrls)
-    //         {
-    //             $sources[] = 'section:' . $section->id;
-    //         }
-    //     }
+        foreach ($sections as $section) {
+            if ($section->type === Section::TYPE_SINGLE) {
+                $showSingles = true;
+            } elseif ($section->hasUrls) {
+                $sources[] = 'section:' . $section->id;
+            }
+        }
 
-    //     if($showSingles)
-    //     {
-    //         array_unshift($sources, 'singles');
-    //     }
+        if ($showSingles) {
+            array_unshift($sources, 'singles');
+        }
 
-    //     return $sources;
-    // }
+        return $sources;
+    }
 
-    // private function _getCategorySources()
-    // {
-    //     $sources = [];
-    //     $categoryGroups = craft()->categories->getAllGroups();
+    private function _getCategorySources(): array
+    {
+        $sources = [];
+        $categoryGroups = Craft::$app->getCategories()->getAllGroups();
 
-    //     foreach($categoryGroups as $categoryGroup)
-    //     {
-    //         if($categoryGroup->hasUrls)
-    //         {
-    //             $sources[] = 'group:' . $categoryGroup->id;
-    //         }
-    //     }
+        foreach ($categoryGroups as $categoryGroup) {
+            if ($categoryGroup->hasUrls) {
+                $sources[] = 'group:' . $categoryGroup->id;
+            }
+        }
 
-    //     return $sources;
-    // }
+        return $sources;
+    }
 
     // private function _getAssetSources()
     // {
