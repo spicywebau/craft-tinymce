@@ -1,0 +1,42 @@
+{
+  "name": "spicyweb/craft-tinymce",
+  "description": "Adds TinyMCE as a rich text field type to Craft CMS",
+  "version": "0.1.0",
+  "type": "craft-plugin",
+  "keywords": [
+    "cms",
+    "craftcms",
+    "plugin",
+    "field"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+        "name": "Spicy Web",
+        "email": "plugins@spicyweb.com.au",
+        "homepage": "https://spicyweb.com.au/"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/spicywebau/craft-tinymce/issues",
+    "source": "https://github.com/spicywebau/craft-tinymce",
+    "docs": "https://github.com/spicywebau/craft-tinymce/blob/1.0.0/README.md",
+    "rss": "https://github.com/spicywebau/craft-tinymce/commits/1.x.atom"
+  },
+  "require": {
+    "craftcms/cms": "^4.2.0",
+    "php": "^8.0.2"
+  },
+  "autoload": {
+    "psr-4": {
+        "spicyweb\\tinymce\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "tinymce",
+    "name": "TinyMCE",
+    "class": "spicyweb\\tinymce\\Plugin",
+    "changelogUrl": "https://github.com/spicywebau/craft-tinymce/blob/1.x/CHANGELOG.md",
+    "downloadUrl": "https://github.com/spicywebau/craft-tinymce/archive/refs/tags/1.0.0.zip"
+  }
+}
