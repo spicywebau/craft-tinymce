@@ -6,8 +6,8 @@ module.exports = {
     devtool: 'source-map',
     entry: {
         'input': path.resolve(__dirname, '../src/main.js'),
-        'tinymce/skins/craft/skin.min': path.resolve(__dirname, '../src/skin/styles/Skin.less'),
-        'tinymce/skins/craft/content.min': path.resolve(__dirname, '../src/skin/styles/Content.less'),
+        'skins/ui/craft/skin.min': path.resolve(__dirname, '../src/skin/styles/Skin.less'),
+        'skins/ui/craft/content.min': path.resolve(__dirname, '../src/skin/styles/Content.less'),
     },
     output: {
         path: path.resolve(__dirname, '../../src/resources'),
@@ -17,7 +17,6 @@ module.exports = {
         jquery: 'jQuery',
         craft: 'Craft',
         garnish: 'Garnish',
-        tinymce: 'tinymce',
     },
     optimization: {
         minimize: true,

@@ -1,6 +1,14 @@
 import $ from 'jquery'
 import Craft from 'craft'
 import tinymce from 'tinymce'
+import 'tinymce/icons/default'
+import 'tinymce/models/dom'
+import 'tinymce/plugins/autoresize'
+import 'tinymce/plugins/code'
+import 'tinymce/plugins/image'
+import 'tinymce/plugins/link'
+import 'tinymce/plugins/lists'
+import 'tinymce/themes/silver'
 
 function showModalFactory(elementType, settings={})
 {
@@ -102,8 +110,8 @@ window.initTinyMCE = function(settings, editorConfig={})
 
 	tinymce.init(Object.assign(
 		{
-			skin: 'craft',
-			plugins: 'autoresize hr lists link image code',
+			plugins: 'autoresize lists link image code',
+			content_css: false,
 
 			// Toolbars
 			menubar: false,

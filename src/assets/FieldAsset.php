@@ -25,7 +25,6 @@ class FieldAsset extends AssetBundle
             CpAsset::class,
         ];
         $this->js = [
-            'tinymce/tinymce.min.js',
             'input.js',
         ];
 
