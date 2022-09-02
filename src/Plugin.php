@@ -3,6 +3,10 @@
 namespace spicyweb\tinymce;
 
 use craft\base\Plugin as BasePlugin;
+use craft\events\RegisterComponentTypesEvent;
+use craft\services\Fields;
+use spicyweb\tinymce\fields\TinyMCE;
+use yii\base\Event;
 
 /**
  * Class Plugin
@@ -19,5 +23,13 @@ class Plugin extends BasePlugin
     public function init(): void
     {
         parent::init();
+
+        Event::on(
+            Fields::class,
+            Fields::EVENT_REGISTER_FIELD_TYPES,
+            function(RegisterComponentTypesEvent $e) {
+                $e->types[] = TinyMCE::class;
+            }
+        );
     }
 }

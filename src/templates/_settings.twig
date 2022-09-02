@@ -1,83 +1,119 @@
 {% import '_includes/forms' as forms %}
 
-{% set columnType %}
-	{{ forms.select({
-		id: 'columnType',
-		name: 'columnType',
-		options: columns,
-		value: settings.columnType,
-	}) }}
-{% endset %}
+{{ forms.selectField({
+    label: 'TinyMCE Config'|t('tinymce'),
+    instructions: 'You can save custom TinyMCE configs as `.json` files in `config/tinymce/.'|t('tinymce')
+        ~ ' <a href="https://www.tiny.cloud/docs/tinymce/6/" rel="noopener" target="_blank" class="go">' ~ 'View available settings'|t('tinymce') ~ '</a>',
+    id: 'tinymceConfig',
+    name: 'tinymceConfig',
+    options: tinymceConfigOptions,
+    value: field.tinymceConfig,
+}) }}
+
+{{ forms.checkboxSelectField({
+    id: 'availableVolumes',
+    name: 'availableVolumes',
+    label: 'Available Volumes'|t('tinymce'),
+    instructions: 'The volumes that should be available when selecting assets (if the selected config has an Image or File button).'|t('tinymce'),
+    options: volumeOptions,
+    values: field.availableVolumes,
+    showAllOption: volumeOptions is not empty,
+}) }}
+
+{{ forms.checkboxSelectField({
+    id: 'availableTransforms',
+    name: 'availableTransforms',
+    label: 'Available Transforms'|t('tinymce'),
+    instructions: 'The transforms that should be available when inserting images.'|t('tinymce'),
+    options: transformOptions,
+    values: field.availableTransforms,
+    showAllOption: transformOptions is not empty,
+}) }}
 
 {{ forms.selectField({
-	label: "TinyMCE Config"|t,
-    instructions: "You can save custom {name} configs as {ext} files in {path}."|t({
-			name: 'TinyMCE',
-			ext: '`.json` or `.js`',
-			path: '`craft/config/tinymce/`',
-		}) ~
-		' <a href="https://www.tinymce.com/docs/" target="_blank">' ~ "View available settings"|t ~ '</a>',
-    id: 'configFle',
-    name: 'configFile',
-    options: tinymceConfigOptions,
-    value: settings.configFile,
+    id: 'defaultTransform',
+    name: 'defaultTransform',
+    label: 'Default Transform'|t('tinymce'),
+    instructions: 'The default transform that should be applied when inserting images.'|t('tinymce'),
+    options: defaultTransformOptions,
+    value: field.defaultTransform,
 }) }}
 
-{{ forms.checkboxSelectField({
-	id: 'availableAssetSources',
-	name: 'availableAssetSources',
-	label: 'Available Asset Sources'|t,
-	instructions: 'The asset sources that should be available when selecting assets (if the selected config has an Image or File button).'|t,
-	options: assetSourceOptions,
-	values: settings.availableAssetSources,
-}) }}
+<hr>
+<a class="fieldtoggle" data-target="advanced">{{ "Advanced"|t('tinymce') }}</a>
+<div id="advanced" class="hidden">
+    <div class="field">
+        <div class="heading">
+            <label>{{ 'Clean up HTML'|t('tinymce') }}</label>
+            <div class="instructions">
+                {{ 'The cleanup actions that should be executed on save.'|t('tinymce') }}
+            </div>
+        </div>
 
-{{ forms.checkboxSelectField({
-	id: 'availableTransforms',
-	name: 'availableTransforms',
-	label: 'Available Image Transforms'|t,
-	instructions: 'The image transforms that should be available when selecting images (if the selected config has an Image button).'|t,
-	options: transformOptions,
-	values: settings.availableTransforms,
-}) }}
+        <div>
+            {{ forms.checkbox({
+                label: 'Remove inline styles'|t('tinymce'),
+                id: 'removeInlineStyles',
+                name: 'removeInlineStyles',
+                checked: field.removeInlineStyles,
+            }) }}
+        </div>
 
-{{ forms.checkboxField({
-	label: "Clean up HTML?"|t,
-	instructions: "Removes <code>&lt;span&gt;</code>’s, empty tags, and most <code>style</code> attributes on save."|t,
-	id: 'cleanupHtml',
-	name: 'cleanupHtml',
-	checked: settings.cleanupHtml,
-}) }}
+        <div>
+            {{ forms.checkbox({
+                label: 'Remove empty tags'|t('tinymce'),
+                id: 'removeEmptyTags',
+                name: 'removeEmptyTags',
+                checked: field.removeEmptyTags,
+            }) }}
+        </div>
 
-{{ forms.checkboxField({
-	label: "Purify HTML?"|t,
-	instructions: 'Removes any potentially-malicious code on save, by running the submitted data through <a href="http://htmlpurifier.org/" target="_blank">HTML Purifier</a>.'|t,
-	warning: 'Disable this at your own risk!'|t,
-	id: 'purifyHtml',
-	name: 'purifyHtml',
-	checked: settings.purifyHtml,
-	toggle: 'purifier-config-container',
-}) }}
+        <div>
+            {{ forms.checkbox({
+                label: 'Replace non-breaking spaces with regular spaces'|t('tinymce'),
+                id: 'removeNbsp',
+                name: 'removeNbsp',
+                checked: field.removeNbsp,
+            }) }}
+        </div>
+    </div>
 
-<div id="purifier-config-container"{% if not settings.purifyHtml %} class="hidden"{% endif %}>
-    {{ forms.selectField({
-        label: "HTML Purifier Config"|t,
-        instructions: "You can save custom {name} configs as {ext} files in {path}."|t({
-				name: 'HTML Purifier',
-				ext: '`.json`',
-				path: '`craft/config/htmlpurifier/`'
-			}) ~
-			' <a href="http://htmlpurifier.org/live/configdoc/plain.html" target="_blank">' ~ "View available settings"|t ~ '</a>',
-        id: 'purifierConfig',
-        name: 'purifierConfig',
-        options: purifierConfigOptions,
-        value: settings.purifierConfig,
+    {{ forms.checkboxField({
+        label: 'Purify HTML'|t('tinymce'),
+        instructions: 'Removes any potentially-malicious code on save, by running the submitted data through <a href="http://htmlpurifier.org/" rel="noopener" target="_blank">HTML Purifier</a>.'|t('tinymce'),
+        warning: 'Disable this at your own risk!'|t('tinymce'),
+        id: 'purifyHtml',
+        name: 'purifyHtml',
+        checked: field.purifyHtml,
+        toggle: 'purifier-config-container',
     }) }}
-</div>
 
-{{ forms.field({
-	label: "Column Type"|t,
-	instructions: "The underlying database column type to use when saving content."|t,
-	id: 'columnType',
-	warning: (existing ? "Changing this may result in data loss."|t),
-}, columnType) }}
+    <div id="purifier-config-container"{% if not field.purifyHtml %} class="hidden"{% endif %}>
+        {{ forms.selectField({
+            label: 'HTML Purifier Config'|t('tinymce'),
+            instructions: 'You can save custom {name} configs as {ext} files in {path}.'|t('tinymce', {
+                name: 'HTML Purifier Config',
+                ext: '`.json`',
+                path: '`config/htmlpurifier/`',
+            }) ~ ' <a href="http://htmlpurifier.org/live/configdoc/plain.html" rel="noopener" target="_blank">' ~ 'View available settings'|t('tinymce') ~ '</a>',
+            id: 'purifierConfig',
+            name: 'purifierConfig',
+            options: purifierConfigOptions,
+            value: field.purifierConfig,
+        }) }}
+    </div>
+
+    {% if craft.app.db.isMysql %}
+        {{ forms.selectField({
+            label: 'Column Type'|t('tinymce'),
+            id: 'column-type',
+            name: 'columnType',
+            instructions: 'The type of column this field should get in the database.'|t('tinymce'),
+            options: [
+                { value: 'text', label: 'text (~64KB)' },
+                { value: 'mediumtext', label: 'mediumtext (~16MB)' },
+            ],
+            value: field.columnType,
+            warning: (field.id ? 'Changing this may result in data loss.'|t('tinymce')),
+        }) }}
+    {% endif %}
