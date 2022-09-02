@@ -2,7 +2,7 @@
   "name": "craft-tinymce",
   "version": "1.0.0",
   "description": "Integrates the TinyMCE editor with Craft CMS",
-  "main": "src/main.js",
+  "main": "client/src/main.js",
   "repository": "https://github.com/spicywebau/craft-tinymce.git",
   "author": "Spicy Web <info@spicyweb.com.au>",
   "license": "MIT",
