@@ -21,15 +21,5 @@ class Settings extends Model
     /**
      * @var bool
      */
-    public bool $cleanupInlineStyles = true;
-
-    /**
-     * @var bool
-     */
-    public bool $cleanupEmptyTags = true;
-
-    /**
-     * @var bool
-     */
     public bool $editorCloudApiKey = false;
 }

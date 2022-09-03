@@ -29,11 +29,6 @@ interface Element {
   url: string
 }
 
-// Because TinyMCE's Editor export doesn't declare addButton ¯\_(ツ)_/¯
-interface FieldEditor extends Editor {
-  addButton: (command: string, settings: object) => void
-}
-
 const showModalFactory: (elementType: string, settings: object) => Function = (elementType, settings = {}) => {
   let modal: GarnishModal|undefined
 
@@ -67,7 +62,7 @@ class TinyMCEField {
         // Toolbars
         menubar: false,
         statusbar: false,
-        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | link entryLink assetLink | image assetMedia | hr | code',
+        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | link craftElementsEntryLink craftElementsAssetLink | image craftElementsAssetMedia | hr | code',
 
         // Formatting
         allow_conditional_comments: false,
@@ -91,7 +86,7 @@ class TinyMCEField {
 
         setup,
 
-        init_instance_callback (editor: FieldEditor) {
+        init_instance_callback (editor: Editor) {
           init(editor)
 
           const configInit = editorConfig.init_instance_callback
@@ -105,9 +100,15 @@ class TinyMCEField {
     tinymce.init(options).then(() => {}, () => {})
   }
 
-  private _setup (editor: FieldEditor): void {
+  private _commandHandleFromElementType (elementType: string): string {
+    return elementType.split('\\')
+      .map((segment, i) => (i === 0 ? segment[0] : segment[0].toUpperCase()) + segment.slice(1).toLowerCase())
+      .join('')
+  }
+
+  private _setup (editor: Editor): void {
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
-      const elementTypeHandle = elementType.replace(/^\w|_\w/g, (match: string) => match.toLowerCase())
+      const elementTypeHandle = this._commandHandleFromElementType(elementType)
       const command = `${elementTypeHandle}Link`
 
       const showModal = showModalFactory(elementType, {
@@ -125,16 +126,15 @@ class TinyMCEField {
         }
       })
 
-      editor.addButton(command, {
+      editor.ui.registry.addButton(command, {
         icon: 'link',
-        storageKey: 'tinymce.' + command,
         tooltip: optionTitle,
-        onclick: () => showModal()
+        onAction: () => showModal()
       })
     }
 
     for (const { elementType, optionTitle, sources } of this._settings.mediaOptions) {
-      const elementTypeHandle = elementType.replace(/^\w|_\w/g, (match) => match.toLowerCase())
+      const elementTypeHandle = this._commandHandleFromElementType(elementType)
       const command = `${elementTypeHandle}Media`
 
       const showModal = showModalFactory(elementType, {
@@ -158,16 +158,15 @@ class TinyMCEField {
         }
       })
 
-      editor.addButton(command, {
+      editor.ui.registry.addButton(command, {
         icon: 'image',
-        storageKey: 'tinymce.' + command,
         tooltip: optionTitle,
-        onclick: () => showModal()
+        onAction: () => showModal()
       })
     }
   }
 
-  private _init (editor: FieldEditor): void {
+  private _init (editor: Editor): void {
     const $element = $(editor.container)
     const $form = $(editor.formElement)
 

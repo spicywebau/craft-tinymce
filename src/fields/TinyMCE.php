@@ -129,8 +129,8 @@ class TinyMCE extends HtmlField
 
         $settings = [
             'id' => $view->namespaceInputId($id),
-            'linkOptions' => [], // $this->_getLinkOptions(),
-            'mediaOptions' => [], // $this->_getVolumeKeys(),
+            'linkOptions' => $this->_getLinkOptions($element),
+            'mediaOptions' => $this->_getMediaOptions(),
             // 'transforms' => $this->_getTransforms(),
             // 'defaultTransform' => $defaultTransform,
             'elementSiteId' => $elementSite->id,
@@ -177,13 +177,13 @@ class TinyMCE extends HtmlField
         ]);
     }
 
-    private function _getLinkOptions(): array
+    private function _getLinkOptions(ElementInterface $element = null): array
     {
         $linkOptions = [];
 
-        $sectionSources = $this->_getSectionSources();
-        $categorySources = $this->_getCategorySources();
-        // $assetSources = $this->_getAssetSources();
+        $sectionSources = $this->_getSectionSources($element);
+        $categorySources = $this->_getCategorySources($element);
+        $volumeKeys = $this->_getVolumeKeys();
 
         if (!empty($sectionSources)) {
             $linkOptions[] = [
@@ -198,66 +198,73 @@ class TinyMCE extends HtmlField
             $linkOptions[] = [
                 'optionTitle' => Craft::t('tinymce', 'Link to a category'),
                 'elementType' => Category::class,
+                'refHandle' => Category::refHandle(),
                 'sources' => $categorySources,
             ];
         }
 
-        // if (!empty($assetSources)) {
-        //     $linkOptions[] = [
-        //         'optionTitle' => Craft::t('tinymce', 'Link to an asset'),
-        //         'elementType' => Asset::class,
-        //         'sources' => $assetSources,
-        //     ];
-        // }
+        if (!empty($volumeKeys)) {
+            $linkOptions[] = [
+                'optionTitle' => Craft::t('tinymce', 'Link to an asset'),
+                'elementType' => Asset::class,
+                'refHandle' => Asset::refHandle(),
+                'sources' => $volumeKeys,
+            ];
+        }
 
         // Give plugins a chance to add their own
-        $allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
+        // $allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
 
-        foreach($allPluginLinkOptions as $pluginLinkOptions)
-        {
-            $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
-        }
+        // foreach($allPluginLinkOptions as $pluginLinkOptions)
+        // {
+        //     $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
+        // }
 
         return $linkOptions;
     }
 
-    // private function _getMediaOptions()
-    // {
-    //     $mediaOptions = [];
+    private function _getMediaOptions()
+    {
+        $mediaOptions = [];
+        $volumeKeys = $this->_getVolumeKeys();
 
-    //     $assetSources = $this->_getAssetSources();
+        if ($volumeKeys) {
+            $mediaOptions[] = [
+                'optionTitle' => Craft::t('tinymce', 'Insert an asset'),
+                'elementType' => Asset::class,
+                'sources' => $volumeKeys,
+            ];
+        }
 
-    //     if($assetSources)
-    //     {
-    //         $mediaOptions[] = [
-    //             'optionTitle' => Craft::t("Insert an asset"),
-    //             'elementType' => 'Asset',
-    //             'sources' => $assetSources,
-    //         ];
-    //     }
+        // Give plugins a chance to add their own
+        // $allPluginMediaOptions = craft()->plugins->call('addRichTextMediaOptions', [], true);
 
-    //     // Give plugins a chance to add their own
-    //     $allPluginMediaOptions = craft()->plugins->call('addRichTextMediaOptions', [], true);
+        // foreach($allPluginMediaOptions as $pluginMediaOptions)
+        // {
+        //     $mediaOptions = array_merge($mediaOptions, $pluginMediaOptions);
+        // }
 
-    //     foreach($allPluginMediaOptions as $pluginMediaOptions)
-    //     {
-    //         $mediaOptions = array_merge($mediaOptions, $pluginMediaOptions);
-    //     }
+        return $mediaOptions;
+    }
 
-    //     return $mediaOptions;
-    // }
-
-    private function _getSectionSources(): array
+    private function _getSectionSources(ElementInterface $element = null): array
     {
         $sources = [];
         $sections = Craft::$app->getSections()->getAllSections();
+        $sites = Craft::$app->getSites()->getAllSites();
         $showSingles = false;
 
         foreach ($sections as $section) {
             if ($section->type === Section::TYPE_SINGLE) {
                 $showSingles = true;
-            } elseif ($section->hasUrls) {
-                $sources[] = 'section:' . $section->id;
+            } elseif ($element) {
+                $sectionSiteSettings = $section->getSiteSettings();
+
+                foreach ($sites as $site) {
+                    if (isset($sectionSiteSettings[$site->id]) && $sectionSiteSettings[$site->id]->hasUrls) {
+                        $sources[] = 'section:' . $section->uid;
+                    }
+                }
             }
         }
 
@@ -265,77 +272,72 @@ class TinyMCE extends HtmlField
             array_unshift($sources, 'singles');
         }
 
+        if (!empty($sources)) {
+            array_unshift($sources, '*');
+        }
+
         return $sources;
     }
 
-    private function _getCategorySources(): array
+    private function _getCategorySources(ElementInterface $element = null): array
     {
         $sources = [];
-        $categoryGroups = Craft::$app->getCategories()->getAllGroups();
 
-        foreach ($categoryGroups as $categoryGroup) {
-            if ($categoryGroup->hasUrls) {
-                $sources[] = 'group:' . $categoryGroup->id;
+        if ($element) {
+            $categoryGroups = Craft::$app->getCategories()->getAllGroups();
+
+            foreach ($categoryGroups as $categoryGroup) {
+                $categoryGroupSiteSettings = $categoryGroup->getSiteSettings();
+
+                if (isset($categoryGroupSiteSettings[$element->siteId]) && $categoryGroupSiteSettings[$element->siteId]->hasUrls) {
+                    $sources[] = 'group:' . $categoryGroup->uid;
+                }
             }
         }
 
         return $sources;
     }
 
-    // private function _getAssetSources()
-    // {
-    //     $sources = [];
-    //     $assetSourceIds = $this->getSettings()->availableAssetSources;
+    private function _getVolumeKeys(): array
+    {
+        if (!$this->availableVolumes) {
+            return [];
+        }
 
-    //     if($assetSourceIds === '*' || !$assetSourceIds)
-    //     {
-    //         $assetSourceIds = craft()->assetSources->getPublicSourceIds();
-    //     }
+        $criteria = ['parentId' => ':empty:'];
 
-    //     $folders = craft()->assets->findFolders([
-    //         'sourceId' => $assetSourceIds,
-    //         'parentId' => ':empty:',
-    //     ]);
+        $allVolumes = Craft::$app->getVolumes()->getAllVolumes();
+        $allowedVolumes = [];
+        $userService = Craft::$app->getUser();
 
-    //     // Sort it by source order.
-    //     $list = [];
-    //     foreach($folders as $folder)
-    //     {
-    //         $list[ $folder->sourceId ] = $folder->id;
-    //     }
+        foreach ($allVolumes as $volume) {
+            $allowedBySettings = $this->availableVolumes === '*' || (is_array($this->availableVolumes) && in_array($volume->uid, $this->availableVolumes));
+            if ($allowedBySettings && $userService->checkPermission("viewAssets:$volume->uid")) {
+                $allowedVolumes[] = 'volume:' . $volume->uid;
+            }
+        }
 
-    //     foreach($assetSourceIds as $assetSourceId) {
-    //         $sources[] = 'folder:' . $list[ $assetSourceId ];
-    //     }
+        return $allowedVolumes;
+    }
 
-    //     return $sources;
-    // }
+    private function _getTransforms()
+    {
+        if (!$this->availableTransforms) {
+            return [];
+        }
 
-    // private function _getTransforms()
-    // {
-    //     $transforms = craft()->assetTransforms->getAllTransforms('id');
-    //     $settings = $this->getSettings();
+        $allTransforms = Craft::$app->getImageTransforms()->getAllTransforms();
+        $transformList = [];
 
-    //     $transformIds = [];
-    //     if(!empty($settings->availableTransforms) && is_array($settings->availableTransforms))
-    //     {
-    //         $transformIds = array_flip($settings->availableTransforms);
-    //     }
+        foreach ($allTransforms as $transform) {
+            if (!is_array($this->availableTransforms) || in_array($transform->uid, $this->availableTransforms, false)) {
+                $transformList[] = [
+                    'handle' => $transform->handle,
+                    'name' => $transform->name,
+                ];
+            }
+        }
 
-    //     if(!empty($transformIds))
-    //     {
-    //         $transforms = array_intersect_key($transforms, $transformIds);
-    //     }
-
-    //     $transformList = [];
-    //     foreach($transforms as $transform)
-    //     {
-    //         $transformList[] = (object) [
-    //             'handle' => HtmlHelper::encode($transform->handle),
-    //             'name' => HtmlHelper::encode($transform->name),
-    //         ];
-    //     }
-
-    //     return $transformList;
-    // }
+        return $transformList;
+    }
 }
