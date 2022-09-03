@@ -12,6 +12,7 @@ use craft\helpers\Json;
 use craft\htmlfield\HtmlField;
 use craft\models\Section;
 use spicyweb\tinymce\assets\FieldAsset;
+use spicyweb\tinymce\assets\TinyMCEAsset;
 use spicyweb\tinymce\Plugin;
 
 class TinyMCE extends HtmlField
@@ -152,6 +153,7 @@ class TinyMCE extends HtmlField
         //     craft()->templates->includeJsResource('tinymce/tinymce/tinymce.min.js');
         // }
 
+        $view->registerAssetBundle(TinyMCEAsset::class);
         $view->registerAssetBundle(FieldAsset::class);
         $view->registerJs('initTinyMCE(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
