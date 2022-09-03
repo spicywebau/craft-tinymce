@@ -116,7 +116,7 @@ window.initTinyMCE = function(settings, editorConfig={})
 			// Toolbars
 			menubar: false,
 			statusbar: false,
-			toolbar: 'formatselect | bold italic strikethrough | bullist numlist | link entryLink assetLink | image assetMedia | hr | code',
+			toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | link entryLink assetLink | image assetMedia | hr | code',
 
 			// Formatting
 			allow_conditional_comments: false,
