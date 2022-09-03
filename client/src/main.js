@@ -103,9 +103,22 @@ window.initTinyMCE = function(settings, editorConfig={})
 	function init(editor)
 	{
 		const $element = $(editor.container)
+		const $form = $(editor.formElement)
 
 		editor.on('focus', e => $element.addClass('mce-focused'))
 		editor.on('blur', e => $element.removeClass('mce-focused'))
+
+		const elementEditor = $form.data('elementEditor')
+		const contentObserver = new window.MutationObserver(() => {
+			editor.targetElm.value = editor.getContent()
+			const $target = elementEditor.isFullPage ? Garnish.$bod : $form
+			$target.trigger('change')
+		})
+		contentObserver.observe(editor.getBody(), {
+			characterData: true,
+			childList: true,
+			subtree: true,
+		})
 	}
 
 	tinymce.init(Object.assign(
