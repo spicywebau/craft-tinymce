@@ -143,17 +143,16 @@ class TinyMCE extends HtmlField
             $settings['direction'] = $locale->getOrientation();
         }
 
-        // $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
-        // if ($apiKey) {
-        //     $libraryDir = 'https://cloud.tinymce.com/stable/';
-        //     $libraryQuery = '?apiKey=' . $apiKey;
+        $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
 
-        //     $view->registerJsFile($libraryDir . 'tinymce.min.js' . $libraryQuery);
-        // } else {
-        //     craft()->templates->includeJsResource('tinymce/tinymce/tinymce.min.js');
-        // }
+        if ($apiKey) {
+            $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
+                'referrerpolicy' => 'origin',
+            ]);
+        } else {
+            $view->registerAssetBundle(TinyMCEAsset::class);
+        }
 
-        $view->registerAssetBundle(TinyMCEAsset::class);
         $view->registerAssetBundle(FieldAsset::class);
         $view->registerJs('initTinyMCE(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
