@@ -62,7 +62,7 @@ class TinyMCEField {
         // Toolbars
         menubar: false,
         statusbar: false,
-        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | link craftElementsEntryLink craftElementsAssetLink | image craftElementsAssetMedia | hr | code',
+        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertMedia | hr | code',
 
         // Formatting
         allow_conditional_comments: false,
@@ -107,9 +107,19 @@ class TinyMCEField {
   }
 
   private _setup (editor: Editor): void {
+    const linkOptions: object[] = [{
+      type: 'menuitem',
+      text: Craft.t('tinymce', 'Insert/edit link'),
+      onAction: () => editor.execCommand('mceLink')
+    }]
+    const mediaOptions: object[] = [{
+      type: 'menuitem',
+      text: Craft.t('tinymce', 'Insert/edit image'),
+      onAction: () => editor.execCommand('mceImage')
+    }]
+
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
       const elementTypeHandle = this._commandHandleFromElementType(elementType)
-      const command = `${elementTypeHandle}Link`
 
       const showModal = showModalFactory(elementType, {
         sources,
@@ -126,16 +136,20 @@ class TinyMCEField {
         }
       })
 
-      editor.ui.registry.addButton(command, {
-        icon: 'link',
-        tooltip: optionTitle,
+      linkOptions.push({
+        type: 'menuitem',
+        text: optionTitle,
         onAction: () => showModal()
       })
     }
 
+    editor.ui.registry.addMenuButton('insertLink', {
+      icon: 'link',
+      fetch: (callback) => callback(linkOptions)
+    })
+
     for (const { elementType, optionTitle, sources } of this._settings.mediaOptions) {
       const elementTypeHandle = this._commandHandleFromElementType(elementType)
-      const command = `${elementTypeHandle}Media`
 
       const showModal = showModalFactory(elementType, {
         sources,
@@ -158,12 +172,17 @@ class TinyMCEField {
         }
       })
 
-      editor.ui.registry.addButton(command, {
-        icon: 'image',
-        tooltip: optionTitle,
+      mediaOptions.push({
+        type: 'menuitem',
+        text: optionTitle,
         onAction: () => showModal()
       })
     }
+
+    editor.ui.registry.addMenuButton('insertMedia', {
+      icon: 'image',
+      fetch: (callback) => callback(mediaOptions)
+    })
   }
 
   private _init (editor: Editor): void {
