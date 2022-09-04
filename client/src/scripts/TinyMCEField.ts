@@ -173,6 +173,7 @@ class TinyMCEField {
     editor.on('focus', (_: EditorEvent<any>) => $element.addClass('mce-focused'))
     editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
 
+    // Update the form value on any content change, and trigger a change event so drafts can autosave
     const elementEditor: ElementEditor = $form.data('elementEditor')
     const contentObserver = new window.MutationObserver(() => {
       $(editor.targetElm).val(editor.getContent())
@@ -184,6 +185,30 @@ class TinyMCEField {
       childList: true,
       subtree: true
     })
+
+    // Allow use of Craft element save shortcuts
+    editor.addShortcut(
+      'meta+s',
+      '',
+      () => Garnish.uiLayerManager.triggerShortcut(new KeyboardEvent('keydown', {
+        shiftKey: false,
+        metaKey: true,
+        ctrlKey: true,
+        altKey: false,
+        keyCode: Garnish.S_KEY
+      }))
+    )
+    editor.addShortcut(
+      'shift+meta+s',
+      '',
+      () => Garnish.uiLayerManager.triggerShortcut(new KeyboardEvent('keydown', {
+        shiftKey: true,
+        metaKey: true,
+        ctrlKey: true,
+        altKey: false,
+        keyCode: Garnish.S_KEY
+      }))
+    )
   }
 }
 
