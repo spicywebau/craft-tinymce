@@ -1,4 +1,5 @@
 const path = require('path')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
@@ -6,8 +7,9 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     input: path.resolve(__dirname, '../src/scripts/main.ts'),
-    'tinymce/skins/ui/craft/skin.min': path.resolve(__dirname, '../src/skin/styles/Skin.less'),
-    'tinymce/skins/ui/craft/content.min': path.resolve(__dirname, '../src/skin/styles/Content.less')
+    'tinymce/skins/content/craft/content.min': path.resolve(__dirname, '../src/styles/content/content.less'),
+    'tinymce/skins/ui/craft/content.min': path.resolve(__dirname, '../src/styles/ui/content.less'),
+    'tinymce/skins/ui/craft/skin.min': path.resolve(__dirname, '../src/styles/ui/skin.less')
   },
   output: {
     path: path.resolve(__dirname, '../../src/resources'),
@@ -24,7 +26,10 @@ module.exports = {
   },
   optimization: {
     minimize: true,
-    minimizer: [new TerserPlugin()]
+    minimizer: [
+      new CssMinimizerPlugin(),
+      new TerserPlugin()
+    ]
   },
   module: {
     rules: [
@@ -43,7 +48,23 @@ module.exports = {
         test: /\.css$/
       },
       {
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                math: 'always',
+                relativeUrls: true
+              }
+            }
+          }
+        ],
         test: /\.less$/
       },
       {

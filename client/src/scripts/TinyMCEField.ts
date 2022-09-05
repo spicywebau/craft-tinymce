@@ -56,6 +56,7 @@ class TinyMCEField {
 
     const options = Object.assign(
       {
+        skin: 'craft',
         plugins: 'autoresize lists link image code',
         content_css: false,
 
