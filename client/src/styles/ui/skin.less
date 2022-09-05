@@ -1,9 +1,41 @@
 @import '@tinymce/oxide/src/less/theme/theme';
 
-@tinymce-border-color: rgba(96, 125, 159, .25);
-@tinymce-border-radius: 3px;
-@tinymce-border-width: 1px;
+// Editor borders
+
+@border-color: rgba(96, 125, 159, 0.25);
+@tinymce-border-radius: @textfield-border-radius;
+@tinymce-border-width: @textfield-border-width;
 
 .mce-focused {
-    box-shadow: var(--focus-ring);
+    box-shadow: @textfield-focus-box-shadow;
 }
+
+// Style dialogs to look like Craft modals
+
+@button-background-color: #e12d39;
+@button-border-width: 0;
+@button-border-radius: var(--large-border-radius);
+@button-disabled-background-color: rgba(225, 45, 57, 0.25);
+@button-hover-background-color: #d61f2b;
+@button-font-weight: @font-weight-normal;
+@button-line-height: 1.42;
+@button-padding-x: 14px;
+@button-padding-y: 7px;
+@button-text-color: @color-white;
+@button-secondary-background-color: rgba(96, 125, 159, 0.25);
+@button-secondary-hover-background-color: rgba(96, 125, 159, 0.3);
+@button-secondary-text-color: #3f4d5a;
+@dialog-backdrop-background-color: rgba(123, 135, 147, 0.35);
+@dialog-body-padding: 24px;
+@dialog-border-radius: 5px;
+@dialog-box-shadow: 0 25px 100px rgba(31, 41, 51, 0.5);
+@dialog-footer-background-color: #e4edf6;
+@dialog-footer-padding: var(--s) var(--xl);
+@dialog-header-padding: @dialog-body-padding @dialog-body-padding 0 @dialog-body-padding;
+@font-stack: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@input-label-font-weight: @font-weight-bold;
+@input-label-text-color: var(--medium-dark-text-color);
+@textfield-border-radius: 3px;
+@textfield-focus-border-color: @textfield-border-color;
+@textfield-focus-box-shadow: var(--focus-ring);
+@textfield-font-size: 0.875rem;
