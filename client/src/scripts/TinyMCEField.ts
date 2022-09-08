@@ -10,7 +10,12 @@ interface Option {
 }
 
 interface FieldSettings {
+  allSites: Array<{
+    value: string
+    text: string
+  }>
   direction: string
+  elementSiteId: string
   id: string
   language: string
   linkOptions: Option[]
@@ -29,7 +34,17 @@ interface Element {
   url: string
 }
 
-const showModalFactory: (elementType: string, settings: object) => Function = (elementType, settings = {}) => {
+interface LinkDialogData {
+  url: string
+  text: string
+  newTab: boolean
+  site: string
+}
+
+type ShowModalFactoryType = (elementType: string, settings: object) => Function
+type DialogConfigFunction = (title: string, items: object[], initialData: object, onChange: Function, onSubmit: Function) => any
+
+const showModalFactory: ShowModalFactoryType = (elementType, settings = {}) => {
   let modal: GarnishModal|undefined
 
   return () => {
@@ -42,6 +57,32 @@ const showModalFactory: (elementType: string, settings: object) => Function = (e
     } else {
       modal.show()
     }
+  }
+}
+
+const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange, onSubmit) => {
+  return {
+    title: Craft.t('tinymce', title),
+    body: {
+      type: 'panel',
+      items
+    },
+    buttons: [
+      {
+        type: 'cancel',
+        name: 'cancel',
+        text: Craft.t('tinymce', 'Cancel')
+      },
+      {
+        type: 'submit',
+        name: 'submit',
+        text: Craft.t('tinymce', 'Save'),
+        buttonType: 'primary'
+      }
+    ],
+    initialData,
+    onChange,
+    onSubmit
   }
 }
 
@@ -102,9 +143,7 @@ class TinyMCEField {
   }
 
   private _commandHandleFromElementType (elementType: string): string {
-    return elementType.split('\\')
-      .map((segment, i) => (i === 0 ? segment[0] : segment[0].toUpperCase()) + segment.slice(1).toLowerCase())
-      .join('')
+    return elementType.split('\\').pop()?.toLowerCase() as string
   }
 
   private _setup (editor: Editor): void {
@@ -125,15 +164,54 @@ class TinyMCEField {
       const showModal = showModalFactory(elementType, {
         sources,
         criteria: { locale: this._settings.locale },
-        onSelect ([element]: [Element]) {
+        onSelect: ([element]: [Element]) => {
           const selectedContent = editor.selection.getContent()
+          editor.windowManager.open(dialogConfig(
+            optionTitle,
+            [
+              {
+                type: 'input',
+                name: 'url',
+                label: Craft.t('tinymce', 'URL'),
+                enabled: false
+              },
+              {
+                type: 'input',
+                name: 'text',
+                label: Craft.t('tinymce', 'Text')
+              },
+              {
+                type: 'checkbox',
+                name: 'newTab',
+                label: Craft.t('tinymce', 'Open in new tab?')
+              },
+              {
+                type: 'selectbox',
+                name: 'site',
+                label: Craft.t('tinymce', 'Site'),
+                items: this._settings.allSites
+              }
+            ],
+            {
+              url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
+              text: selectedContent ?? element.label,
+              site: this._settings.elementSiteId
+            },
+            (api: any) => {
+              const data = api.getData() as LinkDialogData
+              api.setData({
+                url: data.url.replace(/@[0-9]+$/, `@${data.site}`)
+              })
+            },
+            (api: any) => {
+              const data = api.getData() as LinkDialogData
+              const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+              const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
 
-          const url = `${element.url}#${elementTypeHandle}:${element.id}`
-          const title = element.label
-          const label = (selectedContent ?? element.label)
-          const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
-
-          editor.execCommand(command, false, `<a href="${url}" title="${title}">${label}</a>`)
+              editor.execCommand(command, false, newContent)
+              api.close()
+            }
+          ))
         }
       })
 

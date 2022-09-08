@@ -124,7 +124,10 @@ class TinyMCE extends HtmlField
         $allSites = [];
 
         foreach ($sitesService->getAllSites(false) as $site) {
-            $allSites[$site->id] = $site->name;
+            $allSites[] = [
+                'value' => (string)$site->id,
+                'text' => $site->name,
+            ];
         }
 
         $settings = [
@@ -133,7 +136,7 @@ class TinyMCE extends HtmlField
             'mediaOptions' => $this->_getMediaOptions(),
             // 'transforms' => $this->_getTransforms(),
             // 'defaultTransform' => $defaultTransform,
-            'elementSiteId' => $elementSite->id,
+            'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
         ];
 
