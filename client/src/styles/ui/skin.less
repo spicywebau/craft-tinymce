@@ -1,5 +1,9 @@
 @import '@tinymce/oxide/src/less/theme/theme';
 
+@craft-button-secondary-background-color: rgba(96, 125, 159, 0.25);
+@craft-button-secondary-hover-background-color: rgba(96, 125, 159, 0.3);
+@craft-text-color: #3f4d5a;
+
 // Editor borders
 
 @border-color: rgba(96, 125, 159, 0.25);
@@ -22,9 +26,12 @@
 @button-padding-x: 14px;
 @button-padding-y: 7px;
 @button-text-color: @color-white;
-@button-secondary-background-color: rgba(96, 125, 159, 0.25);
-@button-secondary-hover-background-color: rgba(96, 125, 159, 0.3);
-@button-secondary-text-color: #3f4d5a;
+@button-secondary-background-color: @craft-button-secondary-background-color;
+@button-secondary-hover-background-color: @craft-button-secondary-hover-background-color;
+@button-secondary-text-color: @craft-text-color;
+@collection-item-label-text-color: @craft-text-color;
+@collection-list-item-active-background-color: @craft-button-secondary-background-color;
+@collection-list-item-label-active-text-color: @craft-text-color;
 @dialog-backdrop-background-color: rgba(123, 135, 147, 0.35);
 @dialog-body-padding: 24px;
 @dialog-border-radius: 5px;
@@ -35,7 +42,7 @@
 @dialog-header-padding: (@dialog-body-padding / 2) @dialog-body-padding;
 @dialog-title-font-size: 18px;
 @dialog-title-font-weight: @font-weight-bold;
-@dialog-title-text-color: #3f4d5a;
+@dialog-title-text-color: @craft-text-color;
 @editor-header-border: 1px solid @textfield-border-color;
 @editor-header-box-shadow: none;
 @font-stack: system-ui, BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
@@ -45,3 +52,8 @@
 @textfield-focus-border-color: @textfield-border-color;
 @textfield-focus-box-shadow: var(--focus-ring);
 @textfield-font-size: 0.875rem;
+@toolbar-button-active-background-color: rgba(37, 99, 235, 0.3);
+@toolbar-button-bespoke-background-color: @craft-button-secondary-background-color;
+@toolbar-button-hover-background-color: @craft-button-secondary-hover-background-color;
+@toolbar-group-padding-x: 10px;
+@toolbar-group-separator-color: @textfield-border-color;
