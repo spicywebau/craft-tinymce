@@ -146,6 +146,7 @@ class TinyMCEField {
 
     editor.ui.registry.addMenuButton('insertLink', {
       icon: 'link',
+      tooltip: Craft.t('tinymce', 'Link'),
       fetch: (callback) => callback(linkOptions)
     })
 
@@ -182,6 +183,7 @@ class TinyMCEField {
 
     editor.ui.registry.addMenuButton('insertMedia', {
       icon: 'image',
+      tooltip: Craft.t('tinymce', 'Image'),
       fetch: (callback) => callback(mediaOptions)
     })
   }
