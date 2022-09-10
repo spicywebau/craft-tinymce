@@ -116,7 +116,7 @@ class TinyMCE extends HtmlField
         $settings = [
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
-            'mediaOptions' => $this->_getMediaOptions(),
+            'volumes' => $this->_getVolumeKeys(),
             'editorConfig' => $this->config('tinymce', $this->tinymceConfig) ?: [],
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
@@ -199,26 +199,6 @@ class TinyMCE extends HtmlField
         // foreach($allPluginLinkOptions as $pluginLinkOptions)
         // {
         //     $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
-        // }
-
-        return $options;
-    }
-
-    private function _getMediaOptions()
-    {
-        $options = [];
-        $volumeKeys = $this->_getVolumeKeys();
-
-        if ($volumeKeys) {
-            $options[] = self::_option('Insert an asset', Asset::class, Asset::refHandle(), $volumeKeys);
-        }
-
-        // Give plugins a chance to add their own
-        // $allPluginMediaOptions = craft()->plugins->call('addRichTextMediaOptions', [], true);
-
-        // foreach($allPluginMediaOptions as $pluginMediaOptions)
-        // {
-        //     $mediaOptions = array_merge($mediaOptions, $pluginMediaOptions);
         // }
 
         return $options;

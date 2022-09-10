@@ -22,11 +22,11 @@ interface FieldSettings {
   language: string
   linkOptions: Option[]
   locale: string
-  mediaOptions: Option[]
   transforms: Array<{
     value: string
     text: string
   }>
+  volumes: string[]
 }
 
 interface ElementEditor {
@@ -115,7 +115,7 @@ class TinyMCEField {
         // Toolbars
         menubar: false,
         statusbar: false,
-        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertMedia | hr | code',
+        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
 
         // Formatting
         allow_conditional_comments: false,
@@ -162,11 +162,6 @@ class TinyMCEField {
       type: 'menuitem',
       text: Craft.t('tinymce', 'Insert/edit link'),
       onAction: () => editor.execCommand('mceLink')
-    }]
-    const mediaOptions: object[] = [{
-      type: 'menuitem',
-      text: Craft.t('tinymce', 'Insert/edit image'),
-      onAction: () => editor.execCommand('mceImage')
     }]
 
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
@@ -239,11 +234,13 @@ class TinyMCEField {
       fetch: (callback) => callback(linkOptions)
     })
 
-    for (const { elementType, optionTitle, sources } of this._settings.mediaOptions) {
-      const elementTypeHandle = this._commandHandleFromElementType(elementType)
-
-      const showModal = showModalFactory(elementType, {
-        sources,
+    // Image button
+    const imageButtonTitle = Craft.t('tinymce', 'Insert an image')
+    editor.ui.registry.addButton('insertImage', {
+      icon: 'image',
+      tooltip: imageButtonTitle,
+      onAction: () => showModalFactory('craft\\elements\\Asset', {
+        sources: this._settings.volumes,
         transforms: this._settings.transforms.map((transform) => {
           return {
             handle: transform.value,
@@ -264,7 +261,7 @@ class TinyMCEField {
           transforms.push(...this._settings.transforms)
 
           editor.windowManager.open(dialogConfig(
-            optionTitle,
+            imageButtonTitle,
             [
               {
                 type: 'input',
@@ -307,7 +304,7 @@ class TinyMCEField {
 
               const url = [
                 hasTransform ? element.url.replace(/\/([^/]+)$/, `/_${data.transform}/$1`) : element.url,
-                `#${elementTypeHandle}:${element.id}`,
+                `#asset:${element.id}`,
                 hasTransform ? `:transform:${data.transform}` : ''
               ].join('')
               const content = [
@@ -323,19 +320,7 @@ class TinyMCEField {
             }
           ))
         }
-      })
-
-      mediaOptions.push({
-        type: 'menuitem',
-        text: optionTitle,
-        onAction: () => showModal()
-      })
-    }
-
-    editor.ui.registry.addMenuButton('insertMedia', {
-      icon: 'image',
-      tooltip: Craft.t('tinymce', 'Image'),
-      fetch: (callback) => callback(mediaOptions)
+      })()
     })
   }
 
