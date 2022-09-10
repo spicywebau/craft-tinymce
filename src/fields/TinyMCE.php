@@ -193,14 +193,6 @@ class TinyMCE extends HtmlField
             }
         }
 
-        // Give plugins a chance to add their own
-        // $allPluginLinkOptions = craft()->plugins->call('addRichTextLinkOptions', [], true);
-
-        // foreach($allPluginLinkOptions as $pluginLinkOptions)
-        // {
-        //     $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
-        // }
-
         return $options;
     }
 
