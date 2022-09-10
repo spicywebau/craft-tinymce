@@ -104,13 +104,19 @@ class TinyMCE extends HtmlField
             ];
         }
 
+        $defaultTransform = '';
+
+        if (!empty($this->defaultTransform) && $transform = Craft::$app->getImageTransforms()->getTransformByUid($this->defaultTransform)) {
+            $defaultTransform = $transform->handle;
+        }
+
         $settings = [
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'mediaOptions' => $this->_getMediaOptions(),
             'editorConfig' => $this->config('tinymce', $this->tinymceConfig) ?: [],
-            // 'transforms' => $this->_getTransforms(),
-            // 'defaultTransform' => $defaultTransform,
+            'transforms' => $this->_getTransforms(),
+            'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
         ];
@@ -303,14 +309,13 @@ class TinyMCE extends HtmlField
             return [];
         }
 
-        $allTransforms = Craft::$app->getImageTransforms()->getAllTransforms();
         $transformList = [];
 
-        foreach ($allTransforms as $transform) {
+        foreach (Craft::$app->getImageTransforms()->getAllTransforms() as $transform) {
             if (!is_array($this->availableTransforms) || in_array($transform->uid, $this->availableTransforms, false)) {
                 $transformList[] = [
-                    'handle' => $transform->handle,
-                    'name' => $transform->name,
+                    'value' => $transform->handle,
+                    'text' => $transform->name,
                 ];
             }
         }

@@ -14,6 +14,7 @@ interface FieldSettings {
     value: string
     text: string
   }>
+  defaultTransform: string
   direction: string
   editorConfig: RawEditorOptions
   elementSiteId: string
@@ -22,7 +23,10 @@ interface FieldSettings {
   linkOptions: Option[]
   locale: string
   mediaOptions: Option[]
-  transforms: string[]
+  transforms: Array<{
+    value: string
+    text: string
+  }>
 }
 
 interface ElementEditor {
@@ -40,6 +44,14 @@ interface LinkDialogData {
   text: string
   newTab: boolean
   site: string
+}
+
+interface AssetDialogData {
+  title: string
+  caption: string
+  link: string
+  newTab: boolean
+  transform: string
 }
 
 type ShowModalFactoryType = (elementType: string, settings: object) => Function
@@ -92,6 +104,7 @@ class TinyMCEField {
     console.log(this._settings)
     const init = this._init.bind(this)
     const setup = this._setup.bind(this)
+    const settings = this._settings
 
     const options = Object.assign(
       {
@@ -129,7 +142,7 @@ class TinyMCEField {
         init_instance_callback (editor: Editor) {
           init(editor)
 
-          const configInit = this._settings.editorConfig.init_instance_callback
+          const configInit = settings.editorConfig.init_instance_callback
           if (typeof configInit === 'function') {
             configInit.apply(this, arguments)
           }
@@ -231,7 +244,12 @@ class TinyMCEField {
 
       const showModal = showModalFactory(elementType, {
         sources,
-        transforms: this._settings.transforms,
+        transforms: this._settings.transforms.map((transform) => {
+          return {
+            handle: transform.value,
+            name: transform.text
+          }
+        }),
         storageKey: 'RichTextFieldType.ChooseImage',
         criteria: {
           locale: this._settings.locale,
@@ -239,14 +257,71 @@ class TinyMCEField {
         },
         onSelect: ([element]: [Element], transform: string|null = null) => {
           const selectedContent = editor.selection.getContent()
+          const transforms = [{
+            value: '',
+            text: Craft.t('tinymce', 'No transform')
+          }]
+          transforms.push(...this._settings.transforms)
 
-          const url = `${element.url}#${elementTypeHandle}:${element.id}` + (transform !== null ? `:${transform}` : '')
-          const title = element.label
-          const width = ''
-          const height = ''
-          const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+          editor.windowManager.open(dialogConfig(
+            optionTitle,
+            [
+              {
+                type: 'input',
+                name: 'title',
+                label: Craft.t('tinymce', 'Title')
+              },
+              {
+                type: 'input',
+                name: 'caption',
+                label: Craft.t('tinymce', 'Caption')
+              },
+              {
+                type: 'input',
+                name: 'link',
+                label: Craft.t('tinymce', 'Link')
+              },
+              {
+                type: 'checkbox',
+                name: 'newTab',
+                label: Craft.t('tinymce', 'Open in new tab?')
+              },
+              {
+                type: 'selectbox',
+                name: 'transform',
+                label: Craft.t('tinymce', 'Transform'),
+                items: transforms
+              }
+            ],
+            {
+              transform: transform ?? this._settings.defaultTransform
+            },
+            () => {},
+            (api: any) => {
+              const data = api.getData() as AssetDialogData
+              const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+              const hasTitle = data.title.length > 0
+              const hasCaption = data.caption.length > 0
+              const hasLink = data.link.length > 0
+              const hasTransform = data.transform !== ''
 
-          editor.execCommand(command, false, `<img src="${url}" alt="${title}" width="${width}" height="${height}">`)
+              const url = [
+                hasTransform ? element.url.replace(/\/([^/]+)$/, `/_${data.transform}/$1`) : element.url,
+                `#${elementTypeHandle}:${element.id}`,
+                hasTransform ? `:transform:${data.transform}` : ''
+              ].join('')
+              const content = [
+                '<figure>',
+                hasLink ? `<a href="${data.link}"${data.newTab ? ' target="_blank"' : ''}>` : '',
+                `<img src="${url}"${hasTitle ? `alt="${data.title}"` : ''}>`,
+                hasLink ? '</a>' : '',
+                hasCaption ? `<figcaption>${data.caption}</figcaption>` : ''
+              ].join('')
+
+              editor.execCommand(command, false, content)
+              api.close()
+            }
+          ))
         }
       })
 
