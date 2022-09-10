@@ -122,13 +122,8 @@ class TinyMCE extends HtmlField
             'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
+            'direction' => $this->getOrientation($element),
         ];
-
-        if ($this->translationMethod != self::TRANSLATION_METHOD_NONE) {
-            // Explicitly set the text direction
-            $locale = Craft::$app->getI18n()->getLocaleById($elementSite->language);
-            $settings['direction'] = $locale->getOrientation();
-        }
 
         $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
 
