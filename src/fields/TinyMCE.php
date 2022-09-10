@@ -134,6 +134,7 @@ class TinyMCE extends HtmlField
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'mediaOptions' => $this->_getMediaOptions(),
+            'editorConfig' => $this->config('tinymce', $this->tinymceConfig) ?: [],
             // 'transforms' => $this->_getTransforms(),
             // 'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,

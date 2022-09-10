@@ -15,6 +15,7 @@ interface FieldSettings {
     text: string
   }>
   direction: string
+  editorConfig: RawEditorOptions
   elementSiteId: string
   id: string
   language: string
@@ -87,10 +88,7 @@ const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange,
 }
 
 class TinyMCEField {
-  constructor (
-    private readonly _settings: FieldSettings,
-    editorConfig: RawEditorOptions = {}
-  ) {
+  constructor (private readonly _settings: FieldSettings) {
     console.log(this._settings)
     const init = this._init.bind(this)
     const setup = this._setup.bind(this)
@@ -120,7 +118,7 @@ class TinyMCEField {
         // Auto-resize
         autoresize_bottom_margin: 0
       },
-      editorConfig,
+      this._settings.editorConfig,
       {
         selector: `#${this._settings.id}`,
         language: this._settings.language,
@@ -131,7 +129,7 @@ class TinyMCEField {
         init_instance_callback (editor: Editor) {
           init(editor)
 
-          const configInit = editorConfig.init_instance_callback
+          const configInit = this._settings.editorConfig.init_instance_callback
           if (typeof configInit === 'function') {
             configInit.apply(this, arguments)
           }
