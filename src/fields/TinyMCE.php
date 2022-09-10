@@ -4,6 +4,9 @@ namespace spicyweb\tinymce\fields;
 
 use Craft;
 use craft\base\ElementInterface;
+use craft\commerce\elements\Product;
+use craft\commerce\elements\Variant;
+use craft\commerce\Plugin as Commerce;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
@@ -162,37 +165,32 @@ class TinyMCE extends HtmlField
 
     private function _getLinkOptions(ElementInterface $element = null): array
     {
-        $linkOptions = [];
+        $pluginsService = Craft::$app->getPlugins();
+        $options = [];
 
         $sectionSources = $this->_getSectionSources($element);
         $categorySources = $this->_getCategorySources($element);
         $volumeKeys = $this->_getVolumeKeys();
 
         if (!empty($sectionSources)) {
-            $linkOptions[] = [
-                'optionTitle' => Craft::t('tinymce', 'Link to an entry'),
-                'elementType' => Entry::class,
-                'refHandle' => Entry::refHandle(),
-                'sources' => $sectionSources,
-            ];
+            $options[] = self::_option('Link to an entry', Entry::class, Entry::refHandle(), $sectionSources);
         }
 
         if (!empty($categorySources)) {
-            $linkOptions[] = [
-                'optionTitle' => Craft::t('tinymce', 'Link to a category'),
-                'elementType' => Category::class,
-                'refHandle' => Category::refHandle(),
-                'sources' => $categorySources,
-            ];
+            $options[] = self::_option('Link to a category', Category::class, Category::refHandle(), $categorySources);
         }
 
         if (!empty($volumeKeys)) {
-            $linkOptions[] = [
-                'optionTitle' => Craft::t('tinymce', 'Link to an asset'),
-                'elementType' => Asset::class,
-                'refHandle' => Asset::refHandle(),
-                'sources' => $volumeKeys,
-            ];
+            $options[] = self::_option('Link to an asset', Asset::class, Asset::refHandle(), $volumeKeys);
+        }
+
+        if ($pluginsService->isPluginInstalled('commerce') && $pluginsService->isPluginEnabled('commerce')) {
+            $productSources = $this->_getProductSources($element);
+
+            if (!empty($productSources)) {
+                $options[] = self::_option('Link to a product', Product::class, Product::refHandle(), $productSources);
+                $options[] = self::_option('Link to a variant', Variant::class, Variant::refHandle(), $productSources);
+            }
         }
 
         // Give plugins a chance to add their own
@@ -203,20 +201,16 @@ class TinyMCE extends HtmlField
         //     $linkOptions = array_merge($linkOptions, $pluginLinkOptions);
         // }
 
-        return $linkOptions;
+        return $options;
     }
 
     private function _getMediaOptions()
     {
-        $mediaOptions = [];
+        $options = [];
         $volumeKeys = $this->_getVolumeKeys();
 
         if ($volumeKeys) {
-            $mediaOptions[] = [
-                'optionTitle' => Craft::t('tinymce', 'Insert an asset'),
-                'elementType' => Asset::class,
-                'sources' => $volumeKeys,
-            ];
+            $options[] = self::_option('Insert an asset', Asset::class, Asset::refHandle(), $volumeKeys);
         }
 
         // Give plugins a chance to add their own
@@ -227,7 +221,17 @@ class TinyMCE extends HtmlField
         //     $mediaOptions = array_merge($mediaOptions, $pluginMediaOptions);
         // }
 
-        return $mediaOptions;
+        return $options;
+    }
+
+    private static function _option(string $optionTitle, string $elementType, string $refHandle, array $sources): array
+    {
+        return [
+            'optionTitle' => Craft::t('tinymce', $optionTitle),
+            'elementType' => $elementType,
+            'refHandle' => $refHandle,
+            'sources' => $sources,
+        ];
     }
 
     private function _getSectionSources(ElementInterface $element = null): array
@@ -274,6 +278,23 @@ class TinyMCE extends HtmlField
 
                 if (isset($categoryGroupSiteSettings[$element->siteId]) && $categoryGroupSiteSettings[$element->siteId]->hasUrls) {
                     $sources[] = 'group:' . $categoryGroup->uid;
+                }
+            }
+        }
+
+        return $sources;
+    }
+
+    private function _getProductSources(ElementInterface $element = null): array
+    {
+        $sources = [];
+
+        if ($element) {
+            foreach (Commerce::getInstance()->getProductTypes()->getAllProductTypes() as $productType) {
+                $siteSettings = $productType->getSiteSettings();
+
+                if (isset($siteSettings[$element->siteId]) && $siteSettings[$element->siteId]->hasUrls) {
+                    $sources[] = 'productType:' . $productType->uid;
                 }
             }
         }
