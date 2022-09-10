@@ -45,32 +45,6 @@ class TinyMCE extends HtmlField
         return Craft::t('tinymce', 'TinyMCE');
     }
 
-    // public function defineContentAttribute()
-    // {
-    //     $settings = $this->getSettings();
-
-    //     return [ AttributeType::String, 'column' => $settings->columnType ];
-    // }
-
-    // public function validate($value)
-    // {
-    //     $valid = true;
-    //     $settings = $this->getSettings();
-
-    //     $postContentSize = strlen($value);
-    //     $maxDbColumnSize = DbHelper::getTextualColumnStorageCapacity($settings->columnType);
-
-    //     // Give ourselves 10% wiggle room.
-    //     $maxDbColumnSize = ceil($maxDbColumnSize * 0.9);
-
-    //     if($postContentSize > $maxDbColumnSize)
-    //     {
-    //         $valid = Craft::t('{attribute} is too long.', [ 'attribute' => Craft::t($this->model->name) ]);
-    //     }
-
-    //     return $valid;
-    // }
-
     /**
      * @inheritdoc
      */
