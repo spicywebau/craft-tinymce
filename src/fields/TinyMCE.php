@@ -89,7 +89,7 @@ class TinyMCE extends HtmlField
     /**
      * @inheritdoc
      */
-    protected function inputHtml(mixed $value, ElementInterface $element = null): string
+    protected function inputHtml(mixed $value, ?ElementInterface $element = null): string
     {
         $view = Craft::$app->getView();
         $view->registerAssetBundle(FieldAsset::class);
@@ -158,7 +158,7 @@ class TinyMCE extends HtmlField
         ]);
     }
 
-    private function _getLinkOptions(ElementInterface $element = null): array
+    private function _getLinkOptions(?ElementInterface $element = null): array
     {
         $pluginsService = Craft::$app->getPlugins();
         $options = [];
@@ -201,7 +201,7 @@ class TinyMCE extends HtmlField
         ];
     }
 
-    private function _getSectionSources(ElementInterface $element = null): array
+    private function _getSectionSources(?ElementInterface $element = null): array
     {
         $sources = [];
         $sections = Craft::$app->getSections()->getAllSections();
@@ -233,35 +233,26 @@ class TinyMCE extends HtmlField
         return $sources;
     }
 
-    private function _getCategorySources(ElementInterface $element = null): array
+    private function _getCategorySources(?ElementInterface $element = null): array
     {
-        $sources = [];
-
-        if ($element) {
-            $categoryGroups = Craft::$app->getCategories()->getAllGroups();
-
-            foreach ($categoryGroups as $categoryGroup) {
-                $categoryGroupSiteSettings = $categoryGroup->getSiteSettings();
-
-                if (isset($categoryGroupSiteSettings[$element->siteId]) && $categoryGroupSiteSettings[$element->siteId]->hasUrls) {
-                    $sources[] = 'group:' . $categoryGroup->uid;
-                }
-            }
-        }
-
-        return $sources;
+        return self::_sources($element, Craft::$app->getCategories()->getAllGroups(), 'group');
     }
 
-    private function _getProductSources(ElementInterface $element = null): array
+    private function _getProductSources(?ElementInterface $element = null): array
+    {
+        return self::_sources($element, Commerce::getInstance()->getProductTypes()->getAllProductTypes(), 'productType');
+    }
+
+    private static function _sources(?ElementInterface $element, array $types, string $prefix): array
     {
         $sources = [];
 
         if ($element) {
-            foreach (Commerce::getInstance()->getProductTypes()->getAllProductTypes() as $productType) {
-                $siteSettings = $productType->getSiteSettings();
+            foreach ($types as $type) {
+                $siteSettings = $type->getSiteSettings();
 
                 if (isset($siteSettings[$element->siteId]) && $siteSettings[$element->siteId]->hasUrls) {
-                    $sources[] = 'productType:' . $productType->uid;
+                    $sources[] = "$prefix:" . $type->uid;
                 }
             }
         }
