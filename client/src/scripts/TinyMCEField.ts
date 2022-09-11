@@ -200,7 +200,8 @@ class TinyMCEField {
             ],
             {
               url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
-              text: selectedContent ?? element.label,
+              // Doing `String(element.label)` in case the element title was a number
+              text: selectedContent.length > 0 ? selectedContent : String(element.label),
               site: this._settings.elementSiteId
             },
             (api: any) => {
