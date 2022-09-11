@@ -75,7 +75,7 @@ const showModalFactory: ShowModalFactoryType = (elementType, settings = {}) => {
 
 const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange, onSubmit) => {
   return {
-    title: Craft.t('tinymce', title),
+    title,
     body: {
       type: 'panel',
       items
