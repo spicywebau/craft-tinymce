@@ -101,7 +101,6 @@ const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange,
 
 class TinyMCEField {
   constructor (private readonly _settings: FieldSettings) {
-    console.log(this._settings)
     const init = this._init.bind(this)
     const setup = this._setup.bind(this)
     const settings = this._settings
