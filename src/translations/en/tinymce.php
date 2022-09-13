@@ -3,6 +3,7 @@
 return [
     'Cancel' => 'Cancel',
     'Caption' => 'Caption',
+    'Edit link' => 'Edit link',
     'Insert an image' => 'Insert an image',
     'Insert/edit link' => 'Insert/edit link',
     'Link' => 'Link',

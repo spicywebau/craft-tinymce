@@ -115,6 +115,9 @@ class TinyMCEField {
         statusbar: false,
         toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
 
+        // Context menu (the default setting, except replacing the inbuilt link option with our own)
+        contextmenu: 'craftLink linkchecker image editimage table spellchecker configurepermanentpen',
+
         // Formatting
         allow_conditional_comments: false,
         element_format: 'html',
@@ -165,17 +168,19 @@ class TinyMCEField {
       text: Craft.t('tinymce', 'Insert/edit link'),
       onAction: () => this.editor.execCommand('mceLink')
     }]
+    const elementTypeHandles: string[] = []
 
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
       const elementTypeHandle = this._commandHandleFromElementType(elementType)
+      const menuItemTitle = `${elementTypeHandle}Link`
 
       const showModal = showModalFactory(elementType, {
         sources,
         criteria: { locale: this._settings.locale },
         onSelect: ([element]: [Element]) => {
           const selectedContent = this.editor.selection.getContent()
-          this.editor.windowManager.open(this._linkDialogConfig(optionTitle, {
-            url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
+          this.editor.windowManager.open(this._linkDialogConfig(optionTitle, false, {
+            url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}:url`,
             // Doing `String(element.label)` in case the element title was a number
             text: selectedContent.length > 0 ? selectedContent : String(element.label),
             site: this._settings.elementSiteId
@@ -188,12 +193,54 @@ class TinyMCEField {
         text: optionTitle,
         onAction: () => showModal()
       })
+      this.editor.ui.registry.addMenuItem(menuItemTitle, {
+        icon: 'link',
+        text: optionTitle,
+        onAction: () => showModal()
+      })
+      elementTypeHandles.push(menuItemTitle)
     }
 
+    // Insert link menu button, for use on the toolbar
     this.editor.ui.registry.addMenuButton('insertLink', {
       icon: 'link',
       tooltip: Craft.t('tinymce', 'Link'),
       fetch: (callback) => callback(linkOptions)
+    })
+
+    // Edit link menu item, for use on the context menu
+    const editLinkTitle = Craft.t('tinymce', 'Edit link')
+    this.editor.ui.registry.addMenuItem('editLink', {
+      icon: 'link',
+      text: editLinkTitle,
+      onAction: (_) => {
+        const element = this.editor.dom.getParent(this.editor.selection.getStart(), 'a[href]') as globalThis.Element
+        const url = element?.getAttribute('href') ?? ''
+        const siteMatch = url.match(/@([0-9]+)(:url)$/)
+        this.editor.selection.select(element)
+        this.editor.windowManager.open(this._linkDialogConfig(editLinkTitle, true, {
+          url,
+          text: element?.textContent ?? '',
+          site: siteMatch !== null ? siteMatch[1] : this._settings.elementSiteId
+        }))
+      }
+    })
+
+    this.editor.ui.registry.addContextMenu('craftLink', {
+      update: (element) => {
+        const parents = this.editor.dom.getParents(element, 'a')
+
+        // If we're not on a link, show the element link options
+        if (parents.length === 0) {
+          return elementTypeHandles.join(' ')
+        }
+
+        // If we're on a Craft link, show the Craft edit link option
+        // Otherwise, show the normal TinyMCE link option
+        const onCraftLink = parents.some((parent) => parent.href.endsWith(':url'))
+
+        return `${onCraftLink ? 'editLink' : 'link'} unlink openlink`
+      }
     })
 
     // Image button
@@ -331,7 +378,7 @@ class TinyMCEField {
     )
   }
 
-  private _linkDialogConfig (title: string, initialData: object): any {
+  private _linkDialogConfig (title: string, enforceReplace: boolean, initialData: object): any {
     const selectedContent = this.editor.selection.getContent()
     return dialogConfig(
       title,
@@ -363,12 +410,12 @@ class TinyMCEField {
       (api: any) => {
         const data = api.getData() as LinkDialogData
         api.setData({
-          url: data.url.replace(/@[0-9]+$/, `@${data.site}`)
+          url: data.url.replace(/@([0-9]+)(:url)$/, `@${data.site}:url`)
         })
       },
       (api: any) => {
         const data = api.getData() as LinkDialogData
-        const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+        const command = enforceReplace || selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
         const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
 
         this.editor.execCommand(command, false, newContent)
