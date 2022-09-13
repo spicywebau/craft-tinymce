@@ -228,6 +228,7 @@ class TinyMCEField {
         this.editor.windowManager.open(this._linkDialogConfig(editLinkTitle, true, {
           url,
           text: element?.textContent ?? '',
+          newTab: (element?.getAttribute('target') ?? '') === '_blank',
           site: siteMatch !== null ? siteMatch[1] : this._settings.elementSiteId
         }))
       }
