@@ -115,8 +115,8 @@ class TinyMCEField {
         statusbar: false,
         toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
 
-        // Context menu (the default setting, except replacing the inbuilt link option with our own)
-        contextmenu: 'craftLink linkchecker image editimage table spellchecker configurepermanentpen',
+        // Context menu (the default setting, except replacing the inbuilt link/image options with our own)
+        contextmenu: 'craftLink linkchecker craftImage table spellchecker configurepermanentpen',
 
         // Formatting
         allow_conditional_comments: false,
@@ -165,6 +165,11 @@ class TinyMCEField {
   private _setup (): void {
     const linkOptions: object[] = []
     const elementTypeHandles: string[] = []
+    const transformOptions = [{
+      value: '',
+      text: Craft.t('tinymce', 'No transform')
+    }]
+    transformOptions.push(...this._settings.transforms)
 
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
       const elementTypeHandle = this._commandHandleFromElementType(elementType)
@@ -245,7 +250,7 @@ class TinyMCEField {
       }
     })
 
-    // Image button
+    // Image button, for use on the toolbar
     const imageButtonTitle = Craft.t('tinymce', 'Insert an image')
     this.editor.ui.registry.addButton('insertImage', {
       icon: 'image',
@@ -264,74 +269,65 @@ class TinyMCEField {
           kind: 'image'
         },
         onSelect: ([element]: [Element], transform: string|null = null) => {
-          const selectedContent = this.editor.selection.getContent()
-          const transforms = [{
-            value: '',
-            text: Craft.t('tinymce', 'No transform')
-          }]
-          transforms.push(...this._settings.transforms)
-
-          this.editor.windowManager.open(dialogConfig(
-            imageButtonTitle,
-            [
-              {
-                type: 'input',
-                name: 'title',
-                label: Craft.t('tinymce', 'Title')
-              },
-              {
-                type: 'input',
-                name: 'caption',
-                label: Craft.t('tinymce', 'Caption')
-              },
-              {
-                type: 'input',
-                name: 'link',
-                label: Craft.t('tinymce', 'Link')
-              },
-              {
-                type: 'checkbox',
-                name: 'newTab',
-                label: Craft.t('tinymce', 'Open in new tab?')
-              },
-              {
-                type: 'selectbox',
-                name: 'transform',
-                label: Craft.t('tinymce', 'Transform'),
-                items: transforms
-              }
-            ],
-            {
-              transform: transform ?? this._settings.defaultTransform
-            },
-            () => {},
-            (api: any) => {
-              const data = api.getData() as AssetDialogData
-              const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
-              const hasTitle = data.title.length > 0
-              const hasCaption = data.caption.length > 0
-              const hasLink = data.link.length > 0
-              const hasTransform = data.transform !== ''
-
-              const url = [
-                hasTransform ? element.url.replace(/\/([^/]+)$/, `/_${data.transform}/$1`) : element.url,
-                `#asset:${element.id}`,
-                hasTransform ? `:transform:${data.transform}` : ''
-              ].join('')
-              const content = [
-                '<figure>',
-                hasLink ? `<a href="${data.link}"${data.newTab ? ' target="_blank"' : ''}>` : '',
-                `<img src="${url}"${hasTitle ? `alt="${data.title}"` : ''}>`,
-                hasLink ? '</a>' : '',
-                hasCaption ? `<figcaption>${data.caption}</figcaption>` : ''
-              ].join('')
-
-              this.editor.execCommand(command, false, content)
-              api.close()
-            }
-          ))
+          this.editor.windowManager.open(this._imageDialogConfig(imageButtonTitle, true, transformOptions, element, {
+            transform: transform ?? this._settings.defaultTransform
+          }))
         }
       })()
+    })
+
+    // Image menu item, for use on the context menu
+    const editImageTitle = Craft.t('tinymce', 'Edit image')
+    this.editor.ui.registry.addMenuItem('editImage', {
+      icon: 'image',
+      text: editImageTitle,
+      onAction: (_) => {
+        const selectionStart = this.editor.selection.getStart()
+        const img = this.editor.dom.getParent(selectionStart, 'img') as globalThis.Element
+        const a = this.editor.dom.getParent(img, 'a')
+        const figure = this.editor.dom.getParent(a ?? img, 'figure') as globalThis.Element
+        const figcaption = (a ?? img).nextSibling
+        const imgSrc = img?.getAttribute('src')
+
+        const transformMatch = imgSrc?.match(/:transform:(.+)$/) ?? []
+        const transform = transformMatch.length > 0 ? transformMatch.pop() as string : ''
+
+        const elementIdMatch = imgSrc?.match(/#asset:([0-9]+)/) as string[]
+        const elementId = elementIdMatch.pop() as string
+        const elementUrl = (transform !== '' ? imgSrc?.replace(`/_${transform}/`, '/') : imgSrc)
+          ?.replace(`:transform:${transform}`, '')
+          ?.replace(/:url$/, '')
+          ?.replace(`#asset:${elementId}`, '') as string
+
+        this.editor.selection.select(figure)
+        this.editor.windowManager.open(this._imageDialogConfig(editImageTitle, true, transformOptions, {
+          id: elementId,
+          url: elementUrl,
+          label: '' // We don't care about the element label at this point
+        }, {
+          title: img?.getAttribute('alt') ?? '',
+          caption: figcaption?.textContent ?? '',
+          link: a?.href ?? '',
+          newTab: a?.target === '_blank' ?? false,
+          transform
+        }))
+      }
+    })
+
+    this.editor.ui.registry.addContextMenu('craftImage', {
+      update: (element) => {
+        const ancestors = this.editor.dom.getParents(element, 'figure, img')
+
+        // If we're not on an image, don't show an option
+        if (ancestors.length === 0) {
+          return ''
+        }
+
+        // If we're not on a Craft asset, show the normal TinyMCE image option
+        const figure = ancestors.some((ancestor) => ancestor.tagName === 'FIGURE')
+
+        return figure ? 'editImage' : 'image'
+      }
     })
   }
 
@@ -421,6 +417,73 @@ class TinyMCEField {
         const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
 
         this.editor.execCommand(command, false, newContent)
+        api.close()
+      }
+    )
+  }
+
+  private _imageDialogConfig (
+    title: string,
+    enforceReplace: boolean,
+    transforms: object,
+    element: Element,
+    initialData: object
+  ): any {
+    const selectedContent = this.editor.selection.getContent()
+    return dialogConfig(
+      title,
+      [
+        {
+          type: 'input',
+          name: 'title',
+          label: Craft.t('tinymce', 'Title')
+        },
+        {
+          type: 'input',
+          name: 'caption',
+          label: Craft.t('tinymce', 'Caption')
+        },
+        {
+          type: 'input',
+          name: 'link',
+          label: Craft.t('tinymce', 'Link')
+        },
+        {
+          type: 'checkbox',
+          name: 'newTab',
+          label: Craft.t('tinymce', 'Open in new tab?')
+        },
+        {
+          type: 'selectbox',
+          name: 'transform',
+          label: Craft.t('tinymce', 'Transform'),
+          items: transforms
+        }
+      ],
+      initialData,
+      () => {},
+      (api: any) => {
+        const data = api.getData() as AssetDialogData
+        const command = enforceReplace || selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+        const hasTitle = data.title.length > 0
+        const hasCaption = data.caption.length > 0
+        const hasLink = data.link.length > 0
+        const hasTransform = data.transform !== ''
+
+        const url = [
+          hasTransform ? element.url.replace(/\/([^/]+)$/, `/_${data.transform}/$1`) : element.url,
+          `#asset:${element.id}`,
+          hasTransform ? `:transform:${data.transform}` : ''
+        ].join('')
+        const content = [
+          '<figure>',
+          hasLink ? `<a href="${data.link}"${data.newTab ? ' target="_blank"' : ''}>` : '',
+          `<img src="${url}"${hasTitle ? `alt="${data.title}"` : ''}>`,
+          hasLink ? '</a>' : '',
+          hasCaption ? `<figcaption>${data.caption}</figcaption>` : ''
+        ].join('')
+
+        this.editor.execCommand(command, false, content)
         api.close()
       }
     )
