@@ -163,11 +163,7 @@ class TinyMCEField {
   }
 
   private _setup (): void {
-    const linkOptions: object[] = [{
-      type: 'menuitem',
-      text: Craft.t('tinymce', 'Insert/edit link'),
-      onAction: () => this.editor.execCommand('mceLink')
-    }]
+    const linkOptions: object[] = []
     const elementTypeHandles: string[] = []
 
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
@@ -201,6 +197,12 @@ class TinyMCEField {
       elementTypeHandles.push(menuItemTitle)
     }
 
+    linkOptions.push({
+      type: 'menuitem',
+      text: Craft.t('tinymce', 'Insert/edit link'),
+      onAction: () => this.editor.execCommand('mceLink')
+    })
+
     // Insert link menu button, for use on the toolbar
     this.editor.ui.registry.addMenuButton('insertLink', {
       icon: 'link',
@@ -232,7 +234,7 @@ class TinyMCEField {
 
         // If we're not on a link, show the element link options
         if (parents.length === 0) {
-          return elementTypeHandles.join(' ')
+          return `${elementTypeHandles.join(' ')} link`
         }
 
         // If we're on a Craft link, show the Craft edit link option
