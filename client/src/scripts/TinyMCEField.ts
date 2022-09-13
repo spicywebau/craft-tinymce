@@ -246,7 +246,7 @@ class TinyMCEField {
         // Otherwise, show the normal TinyMCE link option
         const onCraftLink = parents.some((parent) => parent.href.endsWith(':url'))
 
-        return `${onCraftLink ? 'editLink' : 'link'} unlink openlink`
+        return `${onCraftLink ? 'editLink' : 'link openlink'} unlink`
       }
     })
 
