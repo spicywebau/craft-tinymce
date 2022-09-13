@@ -171,53 +171,12 @@ class TinyMCEField {
         criteria: { locale: this._settings.locale },
         onSelect: ([element]: [Element]) => {
           const selectedContent = editor.selection.getContent()
-          editor.windowManager.open(dialogConfig(
-            optionTitle,
-            [
-              {
-                type: 'input',
-                name: 'url',
-                label: Craft.t('tinymce', 'URL'),
-                enabled: false
-              },
-              {
-                type: 'input',
-                name: 'text',
-                label: Craft.t('tinymce', 'Text')
-              },
-              {
-                type: 'checkbox',
-                name: 'newTab',
-                label: Craft.t('tinymce', 'Open in new tab?')
-              },
-              {
-                type: 'selectbox',
-                name: 'site',
-                label: Craft.t('tinymce', 'Site'),
-                items: this._settings.allSites
-              }
-            ],
-            {
-              url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
-              // Doing `String(element.label)` in case the element title was a number
-              text: selectedContent.length > 0 ? selectedContent : String(element.label),
-              site: this._settings.elementSiteId
-            },
-            (api: any) => {
-              const data = api.getData() as LinkDialogData
-              api.setData({
-                url: data.url.replace(/@[0-9]+$/, `@${data.site}`)
-              })
-            },
-            (api: any) => {
-              const data = api.getData() as LinkDialogData
-              const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
-              const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
-
-              editor.execCommand(command, false, newContent)
-              api.close()
-            }
-          ))
+          editor.windowManager.open(this._linkDialogConfig(editor, optionTitle, {
+            url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
+            // Doing `String(element.label)` in case the element title was a number
+            text: selectedContent.length > 0 ? selectedContent : String(element.label),
+            site: this._settings.elementSiteId
+          }))
         }
       })
 
@@ -366,6 +325,52 @@ class TinyMCEField {
         altKey: false,
         keyCode: Garnish.S_KEY
       }))
+    )
+  }
+
+  private _linkDialogConfig (editor: Editor, title: string, initialData: object): any {
+    const selectedContent = editor.selection.getContent()
+    return dialogConfig(
+      title,
+      [
+        {
+          type: 'input',
+          name: 'url',
+          label: Craft.t('tinymce', 'URL'),
+          enabled: false
+        },
+        {
+          type: 'input',
+          name: 'text',
+          label: Craft.t('tinymce', 'Text')
+        },
+        {
+          type: 'checkbox',
+          name: 'newTab',
+          label: Craft.t('tinymce', 'Open in new tab?')
+        },
+        {
+          type: 'selectbox',
+          name: 'site',
+          label: Craft.t('tinymce', 'Site'),
+          items: this._settings.allSites
+        }
+      ],
+      initialData,
+      (api: any) => {
+        const data = api.getData() as LinkDialogData
+        api.setData({
+          url: data.url.replace(/@[0-9]+$/, `@${data.site}`)
+        })
+      },
+      (api: any) => {
+        const data = api.getData() as LinkDialogData
+        const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+        const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
+
+        editor.execCommand(command, false, newContent)
+        api.close()
+      }
     )
   }
 }
