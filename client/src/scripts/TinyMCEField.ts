@@ -100,11 +100,10 @@ const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange,
 }
 
 class TinyMCEField {
-  constructor (private readonly _settings: FieldSettings) {
-    const init = this._init.bind(this)
-    const setup = this._setup.bind(this)
-    const settings = this._settings
+  public editor: Editor
 
+  constructor (private readonly _settings: FieldSettings) {
+    const settings = this._settings
     const options = Object.assign(
       {
         skin: 'craft',
@@ -136,10 +135,14 @@ class TinyMCEField {
         language: this._settings.language,
         directionality: this._settings.direction,
 
-        setup,
+        setup: (editor: Editor) => {
+          this.editor = editor
+          this._setup()
+        },
 
-        init_instance_callback (editor: Editor) {
-          init(editor)
+        init_instance_callback: (editor: Editor) => {
+          this.editor = editor
+          this._init()
 
           const configInit = settings.editorConfig.init_instance_callback
           if (typeof configInit === 'function') {
@@ -156,11 +159,11 @@ class TinyMCEField {
     return elementType.split('\\').pop()?.toLowerCase() as string
   }
 
-  private _setup (editor: Editor): void {
+  private _setup (): void {
     const linkOptions: object[] = [{
       type: 'menuitem',
       text: Craft.t('tinymce', 'Insert/edit link'),
-      onAction: () => editor.execCommand('mceLink')
+      onAction: () => this.editor.execCommand('mceLink')
     }]
 
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
@@ -170,8 +173,8 @@ class TinyMCEField {
         sources,
         criteria: { locale: this._settings.locale },
         onSelect: ([element]: [Element]) => {
-          const selectedContent = editor.selection.getContent()
-          editor.windowManager.open(this._linkDialogConfig(editor, optionTitle, {
+          const selectedContent = this.editor.selection.getContent()
+          this.editor.windowManager.open(this._linkDialogConfig(optionTitle, {
             url: `${element.url}#${elementTypeHandle}:${element.id}@${this._settings.elementSiteId}`,
             // Doing `String(element.label)` in case the element title was a number
             text: selectedContent.length > 0 ? selectedContent : String(element.label),
@@ -187,7 +190,7 @@ class TinyMCEField {
       })
     }
 
-    editor.ui.registry.addMenuButton('insertLink', {
+    this.editor.ui.registry.addMenuButton('insertLink', {
       icon: 'link',
       tooltip: Craft.t('tinymce', 'Link'),
       fetch: (callback) => callback(linkOptions)
@@ -195,7 +198,7 @@ class TinyMCEField {
 
     // Image button
     const imageButtonTitle = Craft.t('tinymce', 'Insert an image')
-    editor.ui.registry.addButton('insertImage', {
+    this.editor.ui.registry.addButton('insertImage', {
       icon: 'image',
       tooltip: imageButtonTitle,
       onAction: () => showModalFactory('craft\\elements\\Asset', {
@@ -212,14 +215,14 @@ class TinyMCEField {
           kind: 'image'
         },
         onSelect: ([element]: [Element], transform: string|null = null) => {
-          const selectedContent = editor.selection.getContent()
+          const selectedContent = this.editor.selection.getContent()
           const transforms = [{
             value: '',
             text: Craft.t('tinymce', 'No transform')
           }]
           transforms.push(...this._settings.transforms)
 
-          editor.windowManager.open(dialogConfig(
+          this.editor.windowManager.open(dialogConfig(
             imageButtonTitle,
             [
               {
@@ -274,7 +277,7 @@ class TinyMCEField {
                 hasCaption ? `<figcaption>${data.caption}</figcaption>` : ''
               ].join('')
 
-              editor.execCommand(command, false, content)
+              this.editor.execCommand(command, false, content)
               api.close()
             }
           ))
@@ -283,28 +286,28 @@ class TinyMCEField {
     })
   }
 
-  private _init (editor: Editor): void {
-    const $element = $(editor.container)
-    const $form = $(editor.formElement)
+  private _init (): void {
+    const $element = $(this.editor.container)
+    const $form = $(this.editor.formElement)
 
-    editor.on('focus', (_: EditorEvent<any>) => $element.addClass('mce-focused'))
-    editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
+    this.editor.on('focus', (_: EditorEvent<any>) => $element.addClass('mce-focused'))
+    this.editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
     const elementEditor: ElementEditor = $form.data('elementEditor')
     const contentObserver = new window.MutationObserver(() => {
-      $(editor.targetElm).val(editor.getContent())
+      $(this.editor.targetElm).val(this.editor.getContent())
       const $target = elementEditor.isFullPage ? Garnish.$bod : $form
       $target.trigger('change')
     })
-    contentObserver.observe(editor.getBody(), {
+    contentObserver.observe(this.editor.getBody(), {
       characterData: true,
       childList: true,
       subtree: true
     })
 
     // Allow use of Craft element save shortcuts
-    editor.addShortcut(
+    this.editor.addShortcut(
       'meta+s',
       '',
       () => Garnish.uiLayerManager.triggerShortcut(new KeyboardEvent('keydown', {
@@ -315,7 +318,7 @@ class TinyMCEField {
         keyCode: Garnish.S_KEY
       }))
     )
-    editor.addShortcut(
+    this.editor.addShortcut(
       'shift+meta+s',
       '',
       () => Garnish.uiLayerManager.triggerShortcut(new KeyboardEvent('keydown', {
@@ -328,8 +331,8 @@ class TinyMCEField {
     )
   }
 
-  private _linkDialogConfig (editor: Editor, title: string, initialData: object): any {
-    const selectedContent = editor.selection.getContent()
+  private _linkDialogConfig (title: string, initialData: object): any {
+    const selectedContent = this.editor.selection.getContent()
     return dialogConfig(
       title,
       [
@@ -368,7 +371,7 @@ class TinyMCEField {
         const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
         const newContent = `<a href="${data.url}" title="${data.text}"${data.newTab ? ' target="_blank"' : ''}>${data.text}</a>`
 
-        editor.execCommand(command, false, newContent)
+        this.editor.execCommand(command, false, newContent)
         api.close()
       }
     )
