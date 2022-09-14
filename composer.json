@@ -7,7 +7,8 @@
     "cms",
     "craftcms",
     "plugin",
-    "field"
+    "field",
+    "tinymce"
   ],
   "license": "MIT",
   "authors": [
