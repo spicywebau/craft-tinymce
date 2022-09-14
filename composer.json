@@ -1,6 +1,6 @@
 {
   "name": "spicyweb/craft-tinymce",
-  "description": "Adds TinyMCE as a rich text field type to Craft CMS",
+  "description": "A Craft CMS plugin that adds the TinyMCE editor as a field type.",
   "version": "0.1.0",
   "type": "craft-plugin",
   "keywords": [
