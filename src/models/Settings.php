@@ -9,7 +9,7 @@ use craft\base\Model;
  *
  * @package spicyweb\tinymce\models
  * @author Spicy Web <plugins@spicyweb.com.au>
- * @since 0.1.0
+ * @since 1.0.0
  */
 class Settings extends Model
 {

@@ -10,7 +10,7 @@ use craft\web\assets\cp\CpAsset;
  *
  * @package spicyweb\tinymce\assets
  * @author Spicy Web <plugins@spicyweb.com.au>
- * @since 0.1.0
+ * @since 1.0.0
  */
 class FieldAsset extends AssetBundle
 {

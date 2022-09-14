@@ -1,6 +1,6 @@
 {
   "name": "craft-tinymce",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A Craft CMS plugin that adds the TinyMCE editor as a field type.",
   "private": true,
   "main": "client/src/main.ts",
