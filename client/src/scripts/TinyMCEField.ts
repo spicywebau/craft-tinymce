@@ -120,7 +120,8 @@ class TinyMCEField {
 
         // Formatting
         allow_conditional_comments: false,
-        element_format: 'html',
+        element_format: 'xhtml',
+        entity_encoding: 'raw',
         fix_list_elements: true,
 
         // Links
