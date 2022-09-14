@@ -465,28 +465,41 @@ class TinyMCEField {
       initialData,
       () => {},
       (api: any) => {
-        const data = api.getData() as AssetDialogData
+        const apiData = api.getData() as AssetDialogData
         const command = enforceReplace || selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
-        const hasTitle = data.title.length > 0
-        const hasCaption = data.caption.length > 0
-        const hasLink = data.link.length > 0
-        const hasTransform = data.transform !== ''
+        const hasTitle = apiData.title.length > 0
+        const hasCaption = apiData.caption.length > 0
+        const hasLink = apiData.link.length > 0
+        const hasTransform = apiData.transform !== ''
+        const finishIt: (url: string) => void = (url) => {
+          const content = [
+            '<figure>',
+            hasLink ? `<a href="${apiData.link}"${apiData.newTab ? ' target="_blank"' : ''}>` : '',
+            `<img src="${url}"${hasTitle ? `alt="${apiData.title}"` : ''}>`,
+            hasLink ? '</a>' : '',
+            hasCaption ? `<figcaption>${apiData.caption}</figcaption>` : ''
+          ].join('')
 
-        const url = [
-          hasTransform ? element.url.replace(/\/([^/]+)$/, `/_${data.transform}/$1`) : element.url,
-          `#asset:${element.id}`,
-          hasTransform ? `:transform:${data.transform}` : ''
-        ].join('')
-        const content = [
-          '<figure>',
-          hasLink ? `<a href="${data.link}"${data.newTab ? ' target="_blank"' : ''}>` : '',
-          `<img src="${url}"${hasTitle ? `alt="${data.title}"` : ''}>`,
-          hasLink ? '</a>' : '',
-          hasCaption ? `<figcaption>${data.caption}</figcaption>` : ''
-        ].join('')
+          this.editor.execCommand(command, false, content)
+          api.close()
+        }
 
-        this.editor.execCommand(command, false, content)
-        api.close()
+        if (hasTransform) {
+          const data = {
+            assetId: element.id,
+            handle: apiData.transform
+          }
+          Craft.sendActionRequest('POST', 'assets/generate-transform', { data })
+            .then((response: CraftTransformResponse) => {
+              const url = response.data.url + `#asset:${element.id}:transform:${apiData.transform}`
+              finishIt(url)
+            })
+            .catch((_: any) => {
+              Craft.cp.displayError(Craft.t('tinymce', 'There was an error generating the transform URL.'))
+            })
+        } else {
+          finishIt(`${element.url}#asset:${element.id}:url`)
+        }
       }
     )
   }

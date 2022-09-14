@@ -18,6 +18,7 @@ return [
     'Save' => 'Save',
     'Site' => 'Site',
     'Text' => 'Text',
+    'There was an error generating the transform URL.' => 'There was an error generating the transform URL.',
     'TinyMCE' => 'TinyMCE',
     'Title' => 'Title',
     'Transform' => 'Transform',
