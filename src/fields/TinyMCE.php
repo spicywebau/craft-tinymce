@@ -113,19 +113,22 @@ class TinyMCE extends HtmlField
             $defaultTransform = $transform->handle;
         }
 
+        $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
+        $editorConfig = [
+            'skin' => $apiKey ? 'oxide' : 'craft',
+        ];
+
         $settings = [
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'volumes' => $this->_getVolumeKeys(),
-            'editorConfig' => $this->config('tinymce', $this->tinymceConfig) ?: [],
+            'editorConfig' => $editorConfig + ($this->config('tinymce', $this->tinymceConfig) ?: []),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
             'direction' => $this->getOrientation($element),
         ];
-
-        $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
 
         if ($apiKey) {
             $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
