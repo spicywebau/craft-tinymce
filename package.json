@@ -5,7 +5,7 @@
   "private": true,
   "main": "client/src/main.ts",
   "repository": "https://github.com/spicywebau/craft-tinymce.git",
-  "author": "Spicy Web <info@spicyweb.com.au>",
+  "author": "Spicy Web <plugins@spicyweb.com.au>",
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/ts-standard && ./node_modules/.bin/webpack --config ./client/build/webpack.config.js"
