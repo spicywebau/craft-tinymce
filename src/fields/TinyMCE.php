@@ -155,6 +155,9 @@ class TinyMCE extends HtmlField
             'skin' => $apiKey ? 'oxide' : 'craft',
         ];
 
+        $language = Craft::$app->language;
+        $translations = $this->_loadTranslations($language);
+
         $settings = [
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
@@ -165,6 +168,8 @@ class TinyMCE extends HtmlField
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
             'direction' => $this->getOrientation($element),
+            'language' => $language,
+            'translations' => $translations,
         ];
 
         if ($apiKey) {
@@ -340,5 +345,37 @@ class TinyMCE extends HtmlField
         }
 
         return $transformList;
+    }
+
+    private function _loadTranslations(): array
+    {
+        // TODO: would be good to load translation packages
+        $messages = [
+            'Undo',
+            'Redo',
+            'Blocks',
+            'Paragraph',
+            'Heading 1',
+            'Heading 2',
+            'Heading 3',
+            'Heading 4',
+            'Heading 5',
+            'Heading 6',
+            'Preformatted',
+            'Bold',
+            'Italic',
+            'Strikethrough',
+            'Bullet list',
+            'Numbered list',
+            'Horizontal line',
+            'Source code',
+        ];
+        $translations = [];
+
+        foreach ($messages as $message) {
+            $translations[$message] = Craft::t('tinymce', $message);
+        }
+
+        return $translations;
     }
 }
