@@ -35,7 +35,7 @@
   },
   "extra": {
     "handle": "tinymce",
-    "name": "TinyMCE",
+    "name": "TinyMCE Field",
     "class": "spicyweb\\tinymce\\Plugin",
     "changelogUrl": "https://github.com/spicywebau/craft-tinymce/blob/1.x/CHANGELOG.md",
     "downloadUrl": "https://github.com/spicywebau/craft-tinymce/archive/refs/tags/1.0.0.zip"
