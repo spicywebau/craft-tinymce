@@ -14,11 +14,6 @@ use craft\base\Model;
 class Settings extends Model
 {
     /**
-     * @var string[]
-     */
-    public array $cleanupTags = ['span', 'font'];
-
-    /**
      * @var bool
      */
     public bool $editorCloudApiKey = false;
