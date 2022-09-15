@@ -42,6 +42,7 @@ use craft\elements\Entry;
 use craft\helpers\Html;
 use craft\helpers\Json;
 use craft\htmlfield\HtmlField;
+use craft\htmlfield\HtmlFieldData;
 use craft\models\Section;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
@@ -201,6 +202,22 @@ class TinyMCE extends HtmlField
                 ($this->prepValueForInput($value, $element) ?: '&nbsp;'),
             '</div>',
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function serializeValue(mixed $value, ?ElementInterface $element = null): mixed
+    {
+        if ($value instanceof HtmlFieldData) {
+            $value = $value->getRawContent();
+        }
+
+        if ($this->removeEmptyTags) {
+            $value = preg_replace('/<figure\s*><\/figure>/', '', $value);
+        }
+
+        return parent::serializeValue($value, $element);
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array
