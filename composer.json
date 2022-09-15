@@ -39,5 +39,20 @@
     "class": "spicyweb\\tinymce\\Plugin",
     "changelogUrl": "https://github.com/spicywebau/craft-tinymce/blob/1.x/CHANGELOG.md",
     "downloadUrl": "https://github.com/spicywebau/craft-tinymce/archive/refs/tags/1.0.0.zip"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require-dev": {
+    "craftcms/ecs": "dev-main"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix"
   }
 }
