@@ -2,8 +2,19 @@ import { FieldSettings, TinyMCEField } from './TinyMCEField'
 
 declare global {
   interface Window {
-    initTinyMCE: (settings: FieldSettings) => void
+    TinyMCE: {
+      init: (settings: FieldSettings) => void
+      fields: () => TinyMCEField[]
+    }
   }
 }
 
-window.initTinyMCE = (settings) => new TinyMCEField(settings)
+const fields: TinyMCEField[] = []
+
+window.TinyMCE = {
+  init: (settings) => {
+    fields.push(new TinyMCEField(settings))
+  },
+
+  fields: () => Array.from(fields)
+}

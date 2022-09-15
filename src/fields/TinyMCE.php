@@ -181,7 +181,7 @@ class TinyMCE extends HtmlField
         }
 
         $view->registerAssetBundle(FieldAsset::class);
-        $view->registerJs('initTinyMCE(' . Json::encode($settings) . ');');
+        $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
 
         return implode('', [
