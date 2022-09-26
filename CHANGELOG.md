@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 - 2022-09-26
 
 ### Fixed
 - Fixed a bug where clicking on a TinyMCE dialog backdrop wouldn't close the dialog
