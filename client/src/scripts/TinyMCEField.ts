@@ -100,6 +100,16 @@ const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange,
   }
 }
 
+const backdropObserver = new window.MutationObserver(() => {
+  $('.tox-dialog-wrap__backdrop')
+    .off('click.field')
+    .on('click.field', () => tinymce.activeEditor.windowManager.close())
+})
+backdropObserver.observe(document.body, {
+  childList: true,
+  subtree: true
+})
+
 class TinyMCEField {
   public editor: Editor
 
