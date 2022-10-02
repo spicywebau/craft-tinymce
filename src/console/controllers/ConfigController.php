@@ -27,6 +27,16 @@ class ConfigController extends Controller
     }
 
     /**
+     * Regenerates the Simple.json config file.
+     *
+     * @return int
+     */
+    public function actionRegenerateSimple(): int
+    {
+        return $this->_saveConfig('Simple', Plugin::$plugin->config->generateSimple());
+    }
+
+    /**
      * General method for regenerating TinyMCE field configs.
      */
     private function _saveConfig(string $filename, array $config): int

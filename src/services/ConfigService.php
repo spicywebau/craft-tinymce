@@ -24,7 +24,7 @@ class ConfigService extends Component
      */
     public function generateDefault(array $overrides = []): array
     {
-        return [
+        return $overrides + [
             'skin' => 'craft',
             'plugins' => 'autoresize lists link image code',
             'content_css' => false,
@@ -51,7 +51,21 @@ class ConfigService extends Component
 
             // Auto-resize
             'autoresize_bottom_margin' => 0,
-        ] + $overrides;
+        ];
+    }
+
+    /**
+     * Generates the simple TinyMCE field config.
+     *
+     * @var array $overrides key/value pairs of TinyMCE config options to override the default
+     * @return array
+     */
+    public function generateSimple(array $overrides = []): array
+    {
+        return $this->generateDefault($overrides + [
+            'toolbar' => 'bold italic',
+            'contextmenu' => 'table spellchecker configurepermanentpen',
+        ]);
     }
 
     /**
@@ -64,7 +78,7 @@ class ConfigService extends Component
     {
         $dir = Craft::$app->getPath()->getConfigPath() . DIRECTORY_SEPARATOR . 'tinymce';
         $file = "$filename.json";
-        $json = Json::encode($config, JSON_PRETTY_PRINT);
+        $json = Json::encode($config, JSON_PRETTY_PRINT) . "\n";
         FileHelper::writeToFile($dir . DIRECTORY_SEPARATOR . $file, $json);
     }
 }
