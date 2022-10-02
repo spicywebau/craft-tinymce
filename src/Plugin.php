@@ -8,6 +8,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\services\Fields;
 use spicyweb\tinymce\fields\TinyMCE;
 use spicyweb\tinymce\models\Settings;
+use spicyweb\tinymce\services\ConfigService;
 use yii\base\Event;
 
 /**
@@ -28,6 +29,7 @@ class Plugin extends BasePlugin
     {
         parent::init();
         self::$plugin = $this;
+        $this->_registerServices();
 
         Event::on(
             Fields::class,
@@ -44,5 +46,12 @@ class Plugin extends BasePlugin
     protected function createSettingsModel(): ?Model
     {
         return new Settings();
+    }
+
+    private function _registerServices(): void
+    {
+        $this->setComponents([
+            'config' => ConfigService::class,
+        ]);
     }
 }
