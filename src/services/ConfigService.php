@@ -34,6 +34,40 @@ class ConfigService extends Component
     }
 
     /**
+     * Generates the full TinyMCE field config.
+     *
+     * Based on the settings from https://www.tiny.cloud/docs/tinymce/6/full-featured-open-source-demo/
+     *
+     * @var array $overrides key/value pairs of TinyMCE config options to override the default
+     * @return array
+     */
+    public function generateFull(array $overrides = []): array
+    {
+        return $overrides + [
+            'plugins' => 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            'menubar' => true,
+            'statusbar' => true,
+            'toolbar' => implode(' | ', [
+                'undo redo',
+                'fontfamily fontsize blocks',
+                'bold italic underline strikethrough',
+                'alignleft aligncenter alignright alignjustify',
+                'outdent indent',
+                'bullist numlist',
+                'forecolor backcolor removeformat',
+                'pagebreak',
+                'charmap emoticons',
+                'fullscreen preview save print',
+                'insertfile insertLink insertImage media template anchor codesample',
+                'hr',
+                'ltr rtl',
+                'code',
+            ]),
+            'contextmenu' => 'craftLink linkchecker craftImage table spellchecker configurepermanentpen',
+        ];
+    }
+
+    /**
      * Generates the simple TinyMCE field config.
      *
      * @var array $overrides key/value pairs of TinyMCE config options to override the default

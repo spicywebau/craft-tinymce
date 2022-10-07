@@ -4,6 +4,7 @@
 
 ### Added
 - Added the `php craft tinymce/config/regenerate-default` console command
+- Added the `php craft tinymce/config/regenerate-full` console command
 - Added the `php craft tinymce/config/regenerate-simple` console command
 - Added `spicyweb\tinymce\console\controllers\ConfigController`
 - Added `spicyweb\tinymce\services\ConfigService`

@@ -27,6 +27,16 @@ class ConfigController extends Controller
     }
 
     /**
+     * Regenerates the Full.json config file.
+     *
+     * @return int
+     */
+    public function actionRegenerateFull(): int
+    {
+        return $this->_saveConfig('Full', Plugin::$plugin->config->generateFull());
+    }
+
+    /**
      * Regenerates the Simple.json config file.
      *
      * @return int
