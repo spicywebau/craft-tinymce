@@ -9,6 +9,9 @@
 - Added `spicyweb\tinymce\console\controllers\ConfigController`
 - Added `spicyweb\tinymce\services\ConfigService`
 
+### Changed
+- When installed, the plugin now saves `Default.json`, `Full.json` and `Simple.json` TinyMCE config files in a Craft install's `config/tinymce` directory, if the files didn't already exist
+
 ## 1.0.1 - 2022-09-26
 
 ### Fixed

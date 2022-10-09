@@ -85,6 +85,16 @@ class ConfigService extends Component
     }
 
     /**
+     * Returns the path to the directory where TinyMCE config files are stored.
+     *
+     * @return string
+     */
+    public function path(): string
+    {
+        return Craft::$app->getPath()->getConfigPath() . DIRECTORY_SEPARATOR . 'tinymce';
+    }
+
+    /**
      * Saves a given TinyMCE config into a file with the given name.
      *
      * @var string $filename the filename (without the `.json` suffix)
@@ -92,9 +102,8 @@ class ConfigService extends Component
      */
     public function save(string $filename, array $config): void
     {
-        $dir = Craft::$app->getPath()->getConfigPath() . DIRECTORY_SEPARATOR . 'tinymce';
         $file = "$filename.json";
         $json = Json::encode($config, JSON_PRETTY_PRINT) . "\n";
-        FileHelper::writeToFile($dir . DIRECTORY_SEPARATOR . $file, $json);
+        FileHelper::writeToFile($this->path() . DIRECTORY_SEPARATOR . $file, $json);
     }
 }
