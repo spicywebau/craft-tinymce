@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2022-10-09
 
 ### Added
 - Added the `php craft tinymce/config/regenerate-default` console command
