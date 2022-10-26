@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fixed a bug with the TinyMCE Field settings template, that caused issues when using TinyMCE Field within a Matrix field
+
 ## 1.1.0 - 2022-10-09
 
 ### Added
