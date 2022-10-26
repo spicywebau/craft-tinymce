@@ -2,32 +2,18 @@
 
 namespace spicyweb\tinymce\assets;
 
-use craft\web\AssetBundle;
-use craft\web\assets\cp\CpAsset;
-
-/**
- * Class FieldAsset
- *
- * @package spicyweb\tinymce\assets
- * @author Spicy Web <plugins@spicyweb.com.au>
- * @since 1.0.0
- */
-class TinyMCEAsset extends AssetBundle
-{
+if (false) {
     /**
-     * @inheritdoc
+     * Class TinyMCEAsset
+     *
+     * @package spicyweb\tinymce\assets
+     * @author Spicy Web <plugins@spicyweb.com.au>
+     * @since 1.0.0
+     * @deprecated in 1.2.0 - use \spicyweb\tinymce\assets\tinymce\TinyMCEAsset instead
      */
-    public function init(): void
+    class TinyMCEAsset
     {
-        $this->sourcePath = '@spicyweb/tinymce/resources';
-
-        $this->depends = [
-            CpAsset::class,
-        ];
-        $this->js = [
-            'tinymce/tinymce.min.js',
-        ];
-
-        parent::init();
     }
 }
+
+class_exists(\spicyweb\tinymce\assets\tinymce\TinyMCEAsset::class);

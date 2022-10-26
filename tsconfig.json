@@ -9,9 +9,9 @@
     "strictNullChecks": true
   },
   "files": [
-    "main.ts",
-    "TinyMCEField.ts",
-    "types/Craft.d.ts",
-    "types/Garnish.d.ts",
+    "src/assets/field/src/scripts/main.ts",
+    "src/assets/field/src/scripts/TinyMCEField.ts",
+    "src/assets/field/src/scripts/types/Craft.d.ts",
+    "src/assets/field/src/scripts/types/Garnish.d.ts",
   ]
 }

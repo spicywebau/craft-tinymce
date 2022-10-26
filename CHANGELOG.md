@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Added `spicyweb\tinymce\assets\field\FieldAsset`
+- Added `spicyweb\tinymce\assets\tinymce\TinyMCEAsset`
+
+### Deprecated
+- Deprecated `spicyweb\tinymce\assets\FieldAsset`; use `spicyweb\tinymce\assets\field\FieldAsset` instead
+- Deprecated `spicyweb\tinymce\assets\TinyMCEAsset`; use `spicyweb\tinymce\assets\tinymce\TinyMCEAsset` instead
+
 ## 1.1.1 - 2022-10-26
 
 ### Fixed

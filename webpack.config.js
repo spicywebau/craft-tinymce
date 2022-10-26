@@ -6,13 +6,13 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = {
   devtool: 'source-map',
   entry: {
-    input: path.resolve(__dirname, '../src/scripts/main.ts'),
-    'tinymce/skins/content/craft/content.min': path.resolve(__dirname, '../src/styles/content/content.less'),
-    'tinymce/skins/ui/craft/content.min': path.resolve(__dirname, '../src/styles/ui/content.less'),
-    'tinymce/skins/ui/craft/skin.min': path.resolve(__dirname, '../src/styles/ui/skin.less')
+    'field/dist/scripts/field': path.resolve(__dirname, 'src/assets/field/src/scripts/main.ts'),
+    'tinymce/dist/skins/content/craft/content.min': path.resolve(__dirname, 'src/assets/field/src/styles/content/content.less'),
+    'tinymce/dist/skins/ui/craft/content.min': path.resolve(__dirname, 'src/assets/field/src/styles/ui/content.less'),
+    'tinymce/dist/skins/ui/craft/skin.min': path.resolve(__dirname, 'src/assets/field/src/styles/ui/skin.less')
   },
   output: {
-    path: path.resolve(__dirname, '../../src/resources'),
+    path: path.resolve(__dirname, 'src/assets'),
     filename: '[name].js'
   },
   externals: {
@@ -35,7 +35,7 @@ module.exports = {
     rules: [
       {
         use: ['ts-loader'],
-        include: [path.resolve(__dirname, '../src')],
+        include: [path.resolve(__dirname, 'src/assets/field/src')],
         test: /\.tsx?$/
       },
       {
