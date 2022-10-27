@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- Added `spicyweb\tinymce\fields\TinyMCE::$configSelectionMode`
+- Added `spicyweb\tinymce\fields\TinyMCE::$manualConfig`, which allows entering a custom config in JSON format for a specific TinyMCE field, like can be done for Redactor fields
 - Added `spicyweb\tinymce\assets\field\FieldAsset`
 - Added `spicyweb\tinymce\assets\tinymce\TinyMCEAsset`
 

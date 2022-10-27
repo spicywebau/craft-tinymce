@@ -29,14 +29,47 @@ SOFTWARE.
 
 {% import '_includes/forms' as forms %}
 
-{{ forms.selectField({
+{% set configInput %}
+    <div class="flex">
+        {{ forms.select({
+            name: 'configSelectionMode',
+            options: [
+                { label: 'Choose a config file'|t('tinymce'), value: 'choose' },
+                { label: 'Enter a custom config'|t('tinymce'), value: 'manual' }
+            ],
+            value: field.configSelectionMode,
+            toggle: true,
+            targetPrefix: '.csm-'
+        }) }}
+
+        {{ forms.select({
+            id: 'tinymceConfig',
+            name: 'tinymceConfig',
+            class: ['csm-choose', field.configSelectionMode == 'manual' ? 'hidden']|filter,
+            options: tinymceConfigOptions,
+            value: field.tinymceConfig
+        }) }}
+    </div>
+{% endset %}
+
+{{ forms.field({
     label: 'TinyMCE Config'|t('tinymce'),
-    instructions: 'You can save custom TinyMCE configs as `.json` files in `config/tinymce/`.'|t('tinymce')
+    instructions: 'You can save custom TinyMCE configs as `.json` files in `config/tinymce/`, or you can enter a custom config.'|t('tinymce')
         ~ ' <a href="https://www.tiny.cloud/docs/tinymce/6/" rel="noopener" target="_blank" class="go">' ~ 'View available settings'|t('tinymce') ~ '</a>',
-    id: 'tinymceConfig',
-    name: 'tinymceConfig',
-    options: tinymceConfigOptions,
-    value: field.tinymceConfig,
+    id: 'config',
+    required: true,
+}, configInput) }}
+
+{{ forms.textareaField({
+    label: 'Custom TinyMCE Config'|t('tinymce'),
+    instructions: 'The config must be entered as valid JSON.'|t('tinymce'),
+    fieldClass: ['csm-manual', field.configSelectionMode == 'choose' ? 'hidden']|filter,
+    class: ['code', 'ltr'],
+    name: 'manualConfig',
+    value: field.manualConfig,
+    rows: 10,
+    cols: 50,
+    errors: field.getErrors('manualConfig'),
 }) }}
 
 {{ forms.checkboxSelectField({

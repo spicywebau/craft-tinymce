@@ -47,6 +47,7 @@ use craft\models\Section;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
 use spicyweb\tinymce\Plugin;
+use yii\base\InvalidArgumentException;
 
 /**
  * Class TinyMCE
@@ -74,6 +75,18 @@ class TinyMCE extends HtmlField
     public $availableTransforms = '*';
 
     /**
+     * @var string Config selection mode ('choose' or 'manual')
+     * @since 1.2.0
+     */
+    public string $configSelectionMode = 'choose';
+
+    /**
+     * @var string Manual config to use
+     * @since 1.2.0
+     */
+    public string $manualConfig = '';
+
+    /**
      * @var string The default transform to use.
      */
     public string $defaultTransform = '';
@@ -84,6 +97,30 @@ class TinyMCE extends HtmlField
     public static function displayName(): string
     {
         return Craft::t('tinymce', 'TinyMCE');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['manualConfig'], 'trim'];
+        $rules[] = [
+            ['manualConfig'],
+            function() {
+                if (!Json::isJsonObject($this->manualConfig)) {
+                    $this->addError('manualConfig', Craft::t('tinymce', 'This must be a valid JSON object.'));
+                    return;
+                }
+                try {
+                    Json::decode($this->manualConfig);
+                } catch (InvalidArgumentException $e) {
+                    $this->addError('manualConfig', Craft::t('tinymce', 'This must be a valid JSON object.'));
+                }
+            },
+        ];
+        return $rules;
     }
 
     /**
@@ -163,7 +200,7 @@ class TinyMCE extends HtmlField
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'volumes' => $this->_getVolumeKeys(),
-            'editorConfig' => $editorConfig + ($this->config('tinymce', $this->tinymceConfig) ?: []),
+            'editorConfig' => $editorConfig + $this->_getEditorConfig(),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
@@ -362,6 +399,18 @@ class TinyMCE extends HtmlField
         }
 
         return $transformList;
+    }
+
+    /**
+     * Returns the TinyMCE editor config used by this field.
+     *
+     * @return array
+     */
+    private function _getEditorConfig(): array
+    {
+        return $this->configSelectionMode === 'manual'
+            ? Json::decode($this->manualConfig)
+            : ($this->config('tinymce', $this->tinymceConfig) ?: []);
     }
 
     private function _loadTranslations(): array
