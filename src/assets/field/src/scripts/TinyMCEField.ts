@@ -343,10 +343,7 @@ class TinyMCEField {
       }
     })
 
-    // Credit: https://stackoverflow.com/a/72253934
-    this.editor.on('ScriptsLoaded', () => {
-      tinymce.addI18n(this._settings.language, this._settings.translations)
-    })
+    tinymce.addI18n(this._settings.language, this._settings.translations)
   }
 
   private _init (): void {
