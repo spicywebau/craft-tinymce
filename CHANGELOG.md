@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deprecated `spicyweb\tinymce\assets\TinyMCEAsset`; use `spicyweb\tinymce\assets\tinymce\TinyMCEAsset` instead
 
 ### Fixed
-- Fixed a bug where TinyMCE Fields could cause 404 errors when attempting to load translations
+- Fixed a bug where TinyMCE fields could cause 404 errors when attempting to load translations
 
 ## 1.1.1 - 2022-10-26
 
