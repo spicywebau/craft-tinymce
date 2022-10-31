@@ -354,10 +354,10 @@ class TinyMCEField {
     this.editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
-    const elementEditor: ElementEditor = $form.data('elementEditor')
+    const elementEditor: ElementEditor | undefined = $form.data('elementEditor')
     const contentObserver = new window.MutationObserver(() => {
       $(this.editor.targetElm).val(this.editor.getContent())
-      const $target = elementEditor.isFullPage ? Garnish.$bod : $form
+      const $target = (elementEditor?.isFullPage ?? false) ? Garnish.$bod : $form
       $target.trigger('change')
     })
     contentObserver.observe(this.editor.getBody(), {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed a bug where TinyMCE editors became unusable after activating Craft's preview mode
+- Fixed a script error that occurred when editing elements that don't autosave drafts
 
 ## 1.2.0 - 2022-10-27
 
