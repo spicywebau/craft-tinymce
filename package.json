@@ -1,6 +1,6 @@
 {
   "name": "craft-tinymce",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Adds the TinyMCE rich text editor as a Craft CMS field type",
   "private": true,
   "main": "client/src/main.ts",
