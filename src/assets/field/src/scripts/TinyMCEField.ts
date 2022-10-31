@@ -157,7 +157,7 @@ class TinyMCEField {
 
         init_instance_callback: (editor: Editor) => {
           this.editor = editor
-          this._init()
+          this._init(options)
 
           const configInit = settings.editorConfig.init_instance_callback
           if (typeof configInit === 'function') {
@@ -346,7 +346,7 @@ class TinyMCEField {
     tinymce.addI18n(this._settings.language, this._settings.translations)
   }
 
-  private _init (): void {
+  private _init (options: Object): void {
     const $element = $(this.editor.container)
     const $form = $(this.editor.formElement)
 
@@ -389,6 +389,25 @@ class TinyMCEField {
         keyCode: Garnish.S_KEY
       }))
     )
+
+    // Remove the editor while switching to/from preview mode, otherwise it becomes unusable until page reload
+    if (typeof Craft.Preview !== 'undefined' || typeof Craft.LivePreview !== 'undefined') {
+      const removeEditor: () => void = () => tinymce.execCommand('mceRemoveEditor', false, this._settings.id)
+      const addEditor: () => void = () => tinymce.execCommand('mceAddEditor', false, {
+        id: this._settings.id,
+        options
+      })
+
+      if (typeof Craft.Preview !== 'undefined') {
+        Garnish.on(Craft.Preview, 'beforeOpen beforeClose', removeEditor)
+        Garnish.on(Craft.Preview, 'open close', addEditor)
+      }
+
+      if (typeof Craft.LivePreview !== 'undefined') {
+        Garnish.on(Craft.LivePreview, 'beforeEnter beforeExit', removeEditor)
+        Garnish.on(Craft.LivePreview, 'enter exit', addEditor)
+      }
+    }
   }
 
   private _linkDialogConfig (title: string, enforceReplace: boolean, initialData: object): any {

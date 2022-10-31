@@ -4,6 +4,8 @@
 declare const Craft: {
   cp: Cp
   createElementSelectorModal: (elementType: string, settings: object) => GarnishModal
+  LivePreview: GarnishComponent
+  Preview: GarnishComponent
   sendActionRequest: (method: string, action: string, options?: object) => Promise<CraftTransformResponse>
   t: (category: string, message: string, params?: object) => string
 }
