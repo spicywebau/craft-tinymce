@@ -8,7 +8,7 @@ use craft\helpers\Json;
 use yii\base\Component;
 
 /**
- * Class Plugin
+ * Class ConfigService
  *
  * @package spicyweb\tinymce\services
  * @author Spicy Web <plugins@spicyweb.com.au>
