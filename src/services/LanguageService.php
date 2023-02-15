@@ -10,7 +10,7 @@ use yii\base\Component;
  *
  * @package spicyweb\tinymce\services
  * @author Spicy Web <plugins@spicyweb.com.au>
- * @since 1.3.0
+ * @since 1.4.0
  */
 class LanguageService extends Component
 {
