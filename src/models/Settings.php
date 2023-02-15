@@ -17,4 +17,9 @@ class Settings extends Model
      * @var string|null
      */
     public ?string $editorCloudApiKey = null;
+
+    /**
+     * @var bool
+     */
+    public bool $enablePremiumPlugins = false;
 }

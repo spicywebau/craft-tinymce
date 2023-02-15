@@ -188,7 +188,8 @@ class TinyMCE extends HtmlField
             $defaultTransform = $transform->handle;
         }
 
-        $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
+        $pluginSettings = Plugin::$plugin->getSettings();
+        $apiKey = $pluginSettings->editorCloudApiKey;
         $language = Craft::$app->language;
         $translations = $this->_loadTranslations($language);
 
@@ -210,6 +211,12 @@ class TinyMCE extends HtmlField
             $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
                 'referrerpolicy' => 'origin',
             ]);
+
+            if ($pluginSettings->enablePremiumPlugins) {
+                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                    'referrerpolicy' => 'origin',
+                ]);
+            }
         } else {
             $view->registerAssetBundle(TinyMCEAsset::class);
         }
