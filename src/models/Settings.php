@@ -20,6 +20,7 @@ class Settings extends Model
 
     /**
      * @var bool
+     * @since 1.3.0
      */
     public bool $enablePremiumPlugins = false;
 }
