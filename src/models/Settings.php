@@ -14,7 +14,7 @@ use craft\base\Model;
 class Settings extends Model
 {
     /**
-     * @var bool
+     * @var string|null
      */
-    public bool $editorCloudApiKey = false;
+    public ?string $editorCloudApiKey = null;
 }

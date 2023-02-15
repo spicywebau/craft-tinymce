@@ -189,10 +189,6 @@ class TinyMCE extends HtmlField
         }
 
         $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
-        $editorConfig = [
-            'skin' => $apiKey ? 'oxide' : 'craft',
-        ];
-
         $language = Craft::$app->language;
         $translations = $this->_loadTranslations($language);
 
@@ -200,7 +196,7 @@ class TinyMCE extends HtmlField
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'volumes' => $this->_getVolumeKeys(),
-            'editorConfig' => $editorConfig + $this->_getEditorConfig(),
+            'editorConfig' => $this->_getEditorConfig(),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
@@ -218,7 +214,12 @@ class TinyMCE extends HtmlField
             $view->registerAssetBundle(TinyMCEAsset::class);
         }
 
-        $view->registerAssetBundle(FieldAsset::class);
+        $fieldAssetBundle = $view->registerAssetBundle(FieldAsset::class);
+
+        if (!isset($settings['editorConfig']['skin_url'])) {
+            $settings['editorConfig']['skin_url'] = $fieldAssetBundle->baseUrl . DIRECTORY_SEPARATOR . 'styles';
+        }
+
         $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
 

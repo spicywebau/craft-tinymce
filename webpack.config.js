@@ -7,9 +7,8 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     'field/dist/scripts/field': path.resolve(__dirname, 'src/assets/field/src/scripts/main.ts'),
-    'tinymce/dist/skins/content/craft/content.min': path.resolve(__dirname, 'src/assets/field/src/styles/content/content.less'),
-    'tinymce/dist/skins/ui/craft/content.min': path.resolve(__dirname, 'src/assets/field/src/styles/ui/content.less'),
-    'tinymce/dist/skins/ui/craft/skin.min': path.resolve(__dirname, 'src/assets/field/src/styles/ui/skin.less')
+    'field/dist/styles/content.min': path.resolve(__dirname, 'src/assets/field/src/styles/content.less'),
+    'field/dist/styles/skin.min': path.resolve(__dirname, 'src/assets/field/src/styles/skin.less')
   },
   output: {
     path: path.resolve(__dirname, 'src/assets'),
