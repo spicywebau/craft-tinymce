@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the ability to load official TinyMCE translation files from the `config/tinymce/languages` directory
 - Added `spicyweb\tinymce\services\LanguageService`
 
+## 1.3.0 - 2023-02-15
+
+### Added
+- Added `spicyweb\tinymce\models\Settings::$enablePremiumPlugins`
+
+### Fixed
+- Fixed bugs when using the `editorCloudApiKey` plugin setting
+
 ## 1.2.1 - 2022-10-31
 
 ### Fixed

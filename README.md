@@ -8,6 +8,7 @@ A Craft CMS plugin that adds the [TinyMCE](https://www.tiny.cloud/tinymce/) edit
 
 - [Installation](docs/installation.md)
 - [Console Commands](docs/console-commands.md)
+- [Plugin Settings](docs/plugin-settings.md)
 
 ---
 

@@ -188,11 +188,8 @@ class TinyMCE extends HtmlField
             $defaultTransform = $transform->handle;
         }
 
-        $apiKey = Plugin::$plugin->getSettings()->editorCloudApiKey;
-        $editorConfig = [
-            'skin' => $apiKey ? 'oxide' : 'craft',
-        ];
-
+        $pluginSettings = Plugin::$plugin->getSettings();
+        $apiKey = $pluginSettings->editorCloudApiKey;
         $language = Craft::$app->language;
         $translations = $this->_loadTranslations($language);
 
@@ -200,7 +197,7 @@ class TinyMCE extends HtmlField
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'volumes' => $this->_getVolumeKeys(),
-            'editorConfig' => $editorConfig + $this->_getEditorConfig(),
+            'editorConfig' => $this->_getEditorConfig(),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
             'elementSiteId' => (string)$elementSite->id,
@@ -214,11 +211,22 @@ class TinyMCE extends HtmlField
             $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
                 'referrerpolicy' => 'origin',
             ]);
+
+            if ($pluginSettings->enablePremiumPlugins) {
+                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                    'referrerpolicy' => 'origin',
+                ]);
+            }
         } else {
             $view->registerAssetBundle(TinyMCEAsset::class);
         }
 
-        $view->registerAssetBundle(FieldAsset::class);
+        $fieldAssetBundle = $view->registerAssetBundle(FieldAsset::class);
+
+        if (!isset($settings['editorConfig']['skin_url'])) {
+            $settings['editorConfig']['skin_url'] = $fieldAssetBundle->baseUrl . DIRECTORY_SEPARATOR . 'styles';
+        }
+
         $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
 

@@ -103,7 +103,7 @@ const dialogConfig: DialogConfigFunction = (title, items, initialData, onChange,
 const backdropObserver = new window.MutationObserver(() => {
   $('.tox-dialog-wrap__backdrop')
     .off('click.field')
-    .on('click.field', () => tinymce.activeEditor.windowManager.close())
+    .on('click.field', () => tinymce.activeEditor?.windowManager.close())
 })
 backdropObserver.observe(document.body, {
   childList: true,
@@ -257,7 +257,7 @@ class TinyMCEField {
 
         // If we're on a Craft link, show the Craft edit link option
         // Otherwise, show the normal TinyMCE link option
-        const onCraftLink = parents.some((parent) => parent.href.endsWith(':url'))
+        const onCraftLink = parents.some((parent: HTMLAnchorElement) => parent.href.endsWith(':url'))
 
         return `${onCraftLink ? 'editLink' : 'link openlink'} unlink`
       }
@@ -348,7 +348,7 @@ class TinyMCEField {
 
   private _init (options: Object): void {
     const $element = $(this.editor.container)
-    const $form = $(this.editor.formElement)
+    const $form = $(this.editor.formElement as HTMLElement)
 
     this.editor.on('focus', (_: EditorEvent<any>) => $element.addClass('mce-focused'))
     this.editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
