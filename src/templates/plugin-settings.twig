@@ -1,0 +1,19 @@
+{% import '_includes/forms' as forms %}
+
+<div class="settings">
+    {{ forms.textField({
+        label: 'Tiny Cloud API key'|t('tinymce'),
+        instructions: 'Add your API key to use the cloud version of TinyMCE.'|t('tinymce'),
+        id: 'editorCloudApiKey',
+        name: 'editorCloudApiKey',
+        value: settings.editorCloudApiKey,
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: 'Enable premium plugins?'|t('tinymce'),
+        instructions: 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.'|t('tinymce'),
+        id: 'enablePremiumPlugins',
+        name: 'enablePremiumPlugins',
+        on: settings.enablePremiumPlugins,
+    }) }}
+</div>

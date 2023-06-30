@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'Add your API key to use the cloud version of TinyMCE.' => 'Add your API key to use the cloud version of TinyMCE.',
     'Align' => 'Align',
     'Align center' => 'Align center',
     'Align left' => 'Align left',
@@ -44,6 +45,7 @@ return [
     'Edit link' => 'Edit link',
     'Emojis' => 'Emojis',
     'Emojis...' => 'Emojis...',
+    'Enable premium plugins?' => 'Enable premium plugins?',
     'Enter a custom config' => 'Enter a custom config',
     'File' => 'File',
     'Find and replace...' => 'Find and replace...',
@@ -60,6 +62,7 @@ return [
     'Heading 6' => 'Heading 6',
     'Help' => 'Help',
     'Horizontal line' => 'Horizontal line',
+    'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.' => 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.',
     'Image...' => 'Image...',
     'Increase indent' => 'Increase indent',
     'Insert' => 'Insert',
@@ -135,6 +138,7 @@ return [
     'The config must be entered as valid JSON.' => 'The config must be entered as valid JSON.',
     'There was an error generating the transform URL.' => 'There was an error generating the transform URL.',
     'This must be a valid JSON object.' => 'This must be a valid JSON object.',
+    'Tiny Cloud API key' => 'Tiny Cloud API key',
     'TinyMCE' => 'TinyMCE',
     'Title' => 'Title',
     'Tools' => 'Tools',

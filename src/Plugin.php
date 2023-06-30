@@ -2,6 +2,7 @@
 
 namespace spicyweb\tinymce;
 
+use Craft;
 use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\events\RegisterComponentTypesEvent;
@@ -22,6 +23,11 @@ use yii\base\Event;
 class Plugin extends BasePlugin
 {
     public static ?Plugin $plugin = null;
+
+    /**
+     * @var bool
+     */
+    public bool $hasCpSettings = true;
 
     /**
      * @inheritdoc
@@ -47,6 +53,16 @@ class Plugin extends BasePlugin
     protected function createSettingsModel(): ?Model
     {
         return new Settings();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsHtml(): ?string
+    {
+        return Craft::$app->getView()->renderTemplate('tinymce/plugin-settings', [
+            'settings' => $this->getSettings(),
+        ]);
     }
 
     private function _registerServices(): void

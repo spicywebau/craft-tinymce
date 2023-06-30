@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added the ability to load official TinyMCE translation files from the `config/tinymce/languages` directory
 - Added `spicyweb\tinymce\services\LanguageService`
+- Added a plugin settings page in the Craft control panel
 
 ### Changed
 - Updated the distributed TinyMCE to 6.5.1
