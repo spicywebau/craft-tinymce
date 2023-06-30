@@ -203,7 +203,7 @@ class TinyMCE extends HtmlField
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
             'direction' => $this->getOrientation($element),
-            'language' => $language,
+            'language' => Plugin::$plugin->language->mapLanguage($language),
             'translations' => $translations,
         ];
 
@@ -423,7 +423,6 @@ class TinyMCE extends HtmlField
 
     private function _loadTranslations(): array
     {
-        // TODO: would be good to load translation packages
         $messages = [
             'File',
             'New document',
@@ -552,7 +551,11 @@ class TinyMCE extends HtmlField
         $translations = [];
 
         foreach ($messages as $message) {
-            $translations[$message] = Craft::t('tinymce', $message);
+            $translatedMessage = Craft::t('tinymce', $message);
+
+            if ($message !== $translatedMessage) {
+                $translations[$message] = $translatedMessage;
+            }
         }
 
         return $translations;

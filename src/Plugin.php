@@ -9,6 +9,7 @@ use craft\services\Fields;
 use spicyweb\tinymce\fields\TinyMCE;
 use spicyweb\tinymce\models\Settings;
 use spicyweb\tinymce\services\ConfigService;
+use spicyweb\tinymce\services\LanguageService;
 use yii\base\Event;
 
 /**
@@ -52,6 +53,7 @@ class Plugin extends BasePlugin
     {
         $this->setComponents([
             'config' => ConfigService::class,
+            'language' => LanguageService::class,
         ]);
     }
 }
