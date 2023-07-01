@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added the ability to load official TinyMCE translation files from the `config/tinymce/languages` directory
+- Added `spicyweb\tinymce\enums\TinyMCESource`
+- Added `spicyweb\tinymce\errors\InvalidSourceException`
 - Added `spicyweb\tinymce\services\LanguageService`
+- Added `spicyweb\tinymce\models\Settings::$tinymceCustomSource`
+- Added `spicyweb\tinymce\models\Settings::$tinymceSource`
+- Added `spicyweb\tinymce\models\Settings::nonNullTinymceSource()`
 - Added a plugin settings page in the Craft control panel
 
 ### Changed
 - Updated the distributed TinyMCE to 6.5.1
+- TinyMCE can now be loaded from a user-defined external source
 
 ## 1.3.0 - 2023-02-15
 

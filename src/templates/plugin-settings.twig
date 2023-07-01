@@ -1,19 +1,55 @@
 {% import '_includes/forms' as forms %}
 
 <div class="settings">
-    {{ forms.textField({
-        label: 'Tiny Cloud API key'|t('tinymce'),
-        instructions: 'Add your API key to use the cloud version of TinyMCE.'|t('tinymce'),
-        id: 'editorCloudApiKey',
-        name: 'editorCloudApiKey',
-        value: settings.editorCloudApiKey,
+    {{ forms.selectField({
+        label: 'TinyMCE Source'|t('tinymce'),
+        instructions: 'Where TinyMCE will be loaded from.'|t('tinymce'),
+        id: 'tinymceSource',
+        name: 'tinymceSource',
+        options: [
+            { value: 'default', label: 'Default'|t('tinymce') },
+            { value: 'tinyCloud', label: 'Tiny Cloud'|t('tinymce') },
+            { value: 'custom', label: 'Custom…'|t('app') },
+        ],
+        value: settings.nonNullTinymceSource(),
+        toggle: true,
+        targetPrefix: 'tinymceSource-',
     }) }}
 
-    {{ forms.lightswitchField({
-        label: 'Enable premium plugins?'|t('tinymce'),
-        instructions: 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.'|t('tinymce'),
-        id: 'enablePremiumPlugins',
-        name: 'enablePremiumPlugins',
-        on: settings.enablePremiumPlugins,
-    }) }}
+    {% tag 'div' with {
+        id: 'tinymceSource-tinyCloud',
+        class: settings.tinymceSource != 'tinyCloud' ? 'hidden' : null,
+    } %}
+        {{ forms.textField({
+            label: 'Tiny Cloud API key'|t('tinymce'),
+            instructions: 'Add your API key to use the cloud version of TinyMCE.'|t('tinymce'),
+            id: 'editorCloudApiKey',
+            name: 'editorCloudApiKey',
+            value: settings.editorCloudApiKey,
+        }) }}
+
+        {{ forms.lightswitchField({
+            label: 'Enable premium plugins?'|t('tinymce'),
+            instructions: 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.'|t('tinymce'),
+            id: 'enablePremiumPlugins',
+            name: 'enablePremiumPlugins',
+            on: settings.enablePremiumPlugins,
+        }) }}
+    {% endtag %}
+
+    {% tag 'div' with {
+        id: 'tinymceSource-custom',
+        class: settings.tinymceSource != 'custom' ? 'hidden' : null,
+    } %}
+        {{ forms.autosuggestField({
+            label: 'TinyMCE custom source'|t('tinymce'),
+            instructions: 'A custom URL to load TinyMCE from.'|t('tinymce'),
+            id: 'tinymceCustomSource',
+            name: 'tinymceCustomSource',
+            suggestEnvVars: true,
+            suggestAliases: true,
+            value: settings.tinymceCustomSource,
+            errors: settings.getErrors('tinymceCustomSource'),
+        }) }}
+    {% endtag %}
 </div>

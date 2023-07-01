@@ -41,11 +41,14 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\helpers\Html;
 use craft\helpers\Json;
+use craft\helpers\UrlHelper;
 use craft\htmlfield\HtmlField;
 use craft\htmlfield\HtmlFieldData;
 use craft\models\Section;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
+use spicyweb\tinymce\enums\TinyMCESource;
+use spicyweb\tinymce\errors\InvalidSourceException;
 use spicyweb\tinymce\Plugin;
 use yii\base\InvalidArgumentException;
 
@@ -189,7 +192,7 @@ class TinyMCE extends HtmlField
         }
 
         $pluginSettings = Plugin::$plugin->getSettings();
-        $apiKey = $pluginSettings->editorCloudApiKey;
+        $apiKey = $pluginSettings->editorCloudApiKey ?: 'no-api-key';
         $language = Craft::$app->language;
         $translations = $this->_loadTranslations($language);
 
@@ -207,18 +210,35 @@ class TinyMCE extends HtmlField
             'translations' => $translations,
         ];
 
-        if ($apiKey) {
-            $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
-                'referrerpolicy' => 'origin',
-            ]);
-
-            if ($pluginSettings->enablePremiumPlugins) {
-                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+        // Load the editor from wherever it should be loaded based on the plugin settings
+        switch ($pluginSettings->tinymceSource) {
+            case TinyMCESource::Default:
+                $view->registerAssetBundle(TinyMCEAsset::class);
+                break;
+            case TinyMCESource::TinyCloud:
+                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
                     'referrerpolicy' => 'origin',
                 ]);
-            }
-        } else {
-            $view->registerAssetBundle(TinyMCEAsset::class);
+
+                if ($pluginSettings->enablePremiumPlugins) {
+                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                        'referrerpolicy' => 'origin',
+                    ]);
+                }
+                break;
+            case TinyMCESource::Custom:
+                $customSource = $pluginSettings->tinymceCustomSource;
+
+                if (empty($customSource)) {
+                    throw new InvalidSourceException('`tinymceCustomSource` not set when `tinymceSource` set to ' . TinyMCESource::Custom);
+                }
+
+                $view->registerJsFile(UrlHelper::url($customSource), [
+                    'referrerpolicy' => 'origin',
+                ]);
+                break;
+            default:
+                throw new InvalidSourceException('Invalid `tinymceSource` setting set');
         }
 
         $fieldAssetBundle = $view->registerAssetBundle(FieldAsset::class);
