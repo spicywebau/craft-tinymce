@@ -16,8 +16,8 @@ The URL to load TinyMCE from if `tinymceSource` is set to `'custom'`.
 
 ## `editorCloudApiKey`
 
-The API key to use if `tinymceSource` is set to `'tinyCloud'`.
+The API key to use if `tinymceSource` is set to `'tinyCloud'`, or `enablePremiumPlugins` is `true`.
 
 ## `enablePremiumPlugins`
 
-If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins. If you are not a Tiny Cloud premium customer, this setting has no effect.
+If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins. This setting requires `editorCloudApiKey` to set to a valid Tiny Cloud API key.

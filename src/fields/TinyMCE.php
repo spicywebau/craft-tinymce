@@ -236,6 +236,12 @@ class TinyMCE extends HtmlField
                 $view->registerJsFile(UrlHelper::url($customSource), [
                     'referrerpolicy' => 'origin',
                 ]);
+
+                if ($pluginSettings->enablePremiumPlugins) {
+                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                        'referrerpolicy' => 'origin',
+                    ]);
+                }
                 break;
             default:
                 throw new InvalidSourceException('Invalid `tinymceSource` setting set');

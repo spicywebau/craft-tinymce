@@ -17,27 +17,6 @@
     }) }}
 
     {% tag 'div' with {
-        id: 'tinymceSource-tinyCloud',
-        class: settings.tinymceSource != 'tinyCloud' ? 'hidden' : null,
-    } %}
-        {{ forms.textField({
-            label: 'Tiny Cloud API key'|t('tinymce'),
-            instructions: 'Add your API key to use the cloud version of TinyMCE.'|t('tinymce'),
-            id: 'editorCloudApiKey',
-            name: 'editorCloudApiKey',
-            value: settings.editorCloudApiKey,
-        }) }}
-
-        {{ forms.lightswitchField({
-            label: 'Enable premium plugins?'|t('tinymce'),
-            instructions: 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.'|t('tinymce'),
-            id: 'enablePremiumPlugins',
-            name: 'enablePremiumPlugins',
-            on: settings.enablePremiumPlugins,
-        }) }}
-    {% endtag %}
-
-    {% tag 'div' with {
         id: 'tinymceSource-custom',
         class: settings.tinymceSource != 'custom' ? 'hidden' : null,
     } %}
@@ -52,4 +31,33 @@
             errors: settings.getErrors('tinymceCustomSource'),
         }) }}
     {% endtag %}
+
+    {{ forms.textField({
+        label: 'Tiny Cloud API key'|t('tinymce'),
+        instructions: 'Add your API key if you are using Tiny Cloud to load TinyMCE, or if you are using premium plugins.'|t('tinymce'),
+        id: 'editorCloudApiKey',
+        name: 'editorCloudApiKey',
+        value: settings.editorCloudApiKey,
+    }) }}
+
+    {% tag 'div' with {
+        id: 'enablePremiumPlugins-container',
+        class: settings.editorCloudApiKey is empty ? 'hidden' : null,
+    } %}
+        {{ forms.lightswitchField({
+            label: 'Enable premium plugins?'|t('tinymce'),
+            instructions: 'If you are a Tiny Cloud premium customer, set this to enable the use of premium plugins.'|t('tinymce'),
+            id: 'enablePremiumPlugins',
+            name: 'enablePremiumPlugins',
+            on: settings.enablePremiumPlugins,
+        }) }}
+    {% endtag %}
 </div>
+
+{% js %}
+    var $apiKey = $('#settings-editorCloudApiKey');
+    var $enablePremiumPlugins = $('#settings-enablePremiumPlugins-container');
+    $apiKey.on('keyup', function() {
+        $enablePremiumPlugins.toggleClass('hidden', !$apiKey.val().length);
+    });
+{% endjs %}

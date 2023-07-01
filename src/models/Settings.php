@@ -15,12 +15,12 @@ use spicyweb\tinymce\enums\TinyMCESource;
 class Settings extends Model
 {
     /**
-     * @var string|null The API key to use when [[nonNullTinymceSource()]] returns `tinyCloud`.
+     * @var string|null The API key to use when using Tiny Cloud.
      */
     public ?string $editorCloudApiKey = null;
 
     /**
-     * @var bool Whether to enable premium plugins when [[nonNullTinymceSource()]] returns `tinyCloud`.
+     * @var bool Whether to enable premium plugins (requires [[editorCloudApiKey]] to be set).
      * @since 1.3.0
      */
     public bool $enablePremiumPlugins = false;
