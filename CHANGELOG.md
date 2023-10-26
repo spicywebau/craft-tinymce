@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+- Fixed an error that occurred on 1.4.0 and 1.4.1, when loading an element editor page containing a TinyMCE field, if the plugin settings page had never been opened and saved
+
 ## 1.4.1 - 2023-07-02
 
 ### Fixed

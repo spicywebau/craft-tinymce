@@ -211,7 +211,7 @@ class TinyMCE extends HtmlField
         ];
 
         // Load the editor from wherever it should be loaded based on the plugin settings
-        switch ($pluginSettings->tinymceSource) {
+        switch ($pluginSettings->nonNullTinymceSource()) {
             case TinyMCESource::Default:
                 $view->registerAssetBundle(TinyMCEAsset::class);
                 break;
