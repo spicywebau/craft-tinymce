@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+- Updated the distributed TinyMCE to 6.7.2
+
 ### Fixed
 - Fixed an error that occurred on 1.4.0 and 1.4.1, when loading an element editor page containing a TinyMCE field, if the plugin settings page had never been opened and saved
 
