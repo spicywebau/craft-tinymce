@@ -391,22 +391,42 @@ class TinyMCEField {
     )
 
     // Remove the editor while switching to/from preview mode, otherwise it becomes unusable until page reload
-    if (typeof Craft.Preview !== 'undefined' || typeof Craft.LivePreview !== 'undefined') {
-      const removeEditor: () => void = () => tinymce.execCommand('mceRemoveEditor', false, this._settings.id)
-      const addEditor: () => void = () => tinymce.execCommand('mceAddEditor', false, {
-        id: this._settings.id,
-        options
+    const removeEditor: () => void = () => tinymce.execCommand('mceRemoveEditor', false, this._settings.id)
+    const addEditor: () => void = () => tinymce.execCommand('mceAddEditor', false, {
+      id: this._settings.id,
+      options
+    })
+
+    if (typeof Craft.Preview !== 'undefined') {
+      Garnish.on(Craft.Preview, 'beforeOpen beforeClose', removeEditor)
+      Garnish.on(Craft.Preview, 'open close', addEditor)
+    }
+
+    if (typeof Craft.LivePreview !== 'undefined') {
+      Garnish.on(Craft.LivePreview, 'beforeEnter beforeExit', removeEditor)
+      Garnish.on(Craft.LivePreview, 'enter exit', addEditor)
+    }
+
+    // Remove the editor while dragging Matrix, Neo, Super Table blocks - same reason as above
+    if (typeof Garnish.Drag !== 'undefined') {
+      let draggee: HTMLElement|null = null
+      Garnish.on(Garnish.Drag, 'dragStart', (event: GarnishDragEvent) => {
+        draggee = event.target?.$draggee[0]
+        if (draggee.contains(this.editor.container)) {
+          // Ensure the block height is maintained when dragged, so the empty space left by the block is consistent
+          draggee.style.height = `${draggee.offsetHeight}px`
+          removeEditor()
+        } else {
+          draggee = null
+        }
       })
-
-      if (typeof Craft.Preview !== 'undefined') {
-        Garnish.on(Craft.Preview, 'beforeOpen beforeClose', removeEditor)
-        Garnish.on(Craft.Preview, 'open close', addEditor)
-      }
-
-      if (typeof Craft.LivePreview !== 'undefined') {
-        Garnish.on(Craft.LivePreview, 'beforeEnter beforeExit', removeEditor)
-        Garnish.on(Craft.LivePreview, 'enter exit', addEditor)
-      }
+      Garnish.on(Garnish.Drag, 'dragStop', (_: GarnishDragEvent) => {
+        if (draggee !== null) {
+          draggee.style.height = 'auto'
+          draggee = null
+          addEditor()
+        }
+      })
     }
   }
 
