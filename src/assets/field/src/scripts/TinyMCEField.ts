@@ -347,11 +347,11 @@ class TinyMCEField {
   }
 
   private _init (options: Object): void {
-    const $element = $(this.editor.container)
+    const container = this.editor.container
     const $form = $(this.editor.formElement as HTMLElement)
 
-    this.editor.on('focus', (_: EditorEvent<any>) => $element.addClass('mce-focused'))
-    this.editor.on('blur', (_: EditorEvent<any>) => $element.removeClass('mce-focused'))
+    this.editor.on('focus', (_: EditorEvent<any>) => container.classList.add('mce-focused'))
+    this.editor.on('blur', (_: EditorEvent<any>) => container.classList.remove('mce-focused'))
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
     const elementEditor: ElementEditor | undefined = $form.data('elementEditor')
@@ -412,9 +412,25 @@ class TinyMCEField {
       let draggee: HTMLElement|null = null
       Garnish.on(Garnish.Drag, 'dragStart', (event: GarnishDragEvent) => {
         draggee = event.target?.$draggee[0]
-        if (draggee.contains(this.editor.container)) {
+        if (draggee.contains(container)) {
           // Ensure the block height is maintained when dragged, so the empty space left by the block is consistent
           draggee.style.height = `${draggee.offsetHeight}px`
+
+          // Ensure the cloned iframe has the same content as the original
+          // A small timeout required because the clone's content document seems to get overwritten
+          const editorIframe = container.querySelector('iframe') as HTMLIFrameElement
+          const editorIframeHtmlEl = editorIframe.contentDocument?.querySelector('html') as HTMLElement
+          const editorIframeInnerHtml = editorIframeHtmlEl.innerHTML
+          setTimeout(
+            () => {
+              const blockClone = document.querySelector('.draghelper') as HTMLElement
+              const cloneIframe = blockClone.querySelector(`#${editorIframe.id}`) as HTMLIFrameElement
+              const cloneIframeHtmlEl = cloneIframe.contentDocument?.querySelector('html') as HTMLElement
+              cloneIframeHtmlEl.innerHTML = editorIframeInnerHtml
+            },
+            60
+          )
+
           removeEditor()
         } else {
           draggee = null
@@ -422,8 +438,15 @@ class TinyMCEField {
       })
       Garnish.on(Garnish.Drag, 'dragStop', (_: GarnishDragEvent) => {
         if (draggee !== null) {
-          draggee.style.height = 'auto'
-          draggee = null
+          // A small timeout to let the editor fully reinitialise before reverting the draggee height change
+          setTimeout(
+            () => {
+              (draggee as HTMLElement).style.height = 'auto'
+              draggee = null
+            },
+            100
+          )
+
           addEditor()
         }
       })
