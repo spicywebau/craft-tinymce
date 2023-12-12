@@ -347,11 +347,8 @@ class TinyMCEField {
   }
 
   private _init (options: Object): void {
-    const container = this.editor.container
+    this._initFocus()
     const $form = $(this.editor.formElement as HTMLElement)
-
-    this.editor.on('focus', (_: EditorEvent<any>) => container.classList.add('mce-focused'))
-    this.editor.on('blur', (_: EditorEvent<any>) => container.classList.remove('mce-focused'))
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
     const elementEditor: ElementEditor | undefined = $form.data('elementEditor')
@@ -392,10 +389,13 @@ class TinyMCEField {
 
     // Remove the editor while switching to/from preview mode, otherwise it becomes unusable until page reload
     const removeEditor: () => void = () => tinymce.execCommand('mceRemoveEditor', false, this._settings.id)
-    const addEditor: () => void = () => tinymce.execCommand('mceAddEditor', false, {
-      id: this._settings.id,
-      options
-    })
+    const addEditor: () => void = () => {
+      tinymce.execCommand('mceAddEditor', false, {
+        id: this._settings.id,
+        options
+      })
+      this._initFocus()
+    }
 
     if (typeof Craft.Preview !== 'undefined') {
       Garnish.on(Craft.Preview, 'beforeOpen beforeClose', removeEditor)
@@ -412,13 +412,13 @@ class TinyMCEField {
       let draggee: HTMLElement|null = null
       Garnish.on(Garnish.Drag, 'dragStart', (event: GarnishDragEvent) => {
         draggee = event.target?.$draggee[0]
-        if (draggee.contains(container)) {
+        if (draggee.contains(this.editor.editorContainer)) {
           // Ensure the block height is maintained when dragged, so the empty space left by the block is consistent
           draggee.style.height = `${draggee.offsetHeight}px`
 
           // Ensure the cloned iframe has the same content as the original
           // A small timeout required because the clone's content document seems to get overwritten
-          const editorIframe = container.querySelector('iframe') as HTMLIFrameElement
+          const editorIframe = this.editor.editorContainer.querySelector('iframe') as HTMLIFrameElement
           const editorIframeHtmlEl = editorIframe.contentDocument?.querySelector('html') as HTMLElement
           const editorIframeInnerHtml = editorIframeHtmlEl.innerHTML
           setTimeout(
@@ -451,6 +451,11 @@ class TinyMCEField {
         }
       })
     }
+  }
+
+  private _initFocus (): void {
+    this.editor.on('focus', (_: EditorEvent<any>) => this.editor.container.classList.add('mce-focused'))
+    this.editor.on('blur', (_: EditorEvent<any>) => this.editor.container.classList.remove('mce-focused'))
   }
 
   private _linkDialogConfig (title: string, enforceReplace: boolean, initialData: object): any {
