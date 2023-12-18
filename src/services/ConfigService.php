@@ -28,7 +28,7 @@ class ConfigService extends Component
             'plugins' => 'autoresize lists link image code',
             'menubar' => false,
             'statusbar' => false,
-            'toolbar' => 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
+            'toolbar' => 'undo redo | styles | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
             'contextmenu' => 'craftLink linkchecker craftImage table spellchecker configurepermanentpen',
         ];
     }
@@ -49,7 +49,7 @@ class ConfigService extends Component
             'statusbar' => true,
             'toolbar' => implode(' | ', [
                 'undo redo',
-                'fontfamily fontsize blocks',
+                'fontfamily fontsize styles',
                 'bold italic underline strikethrough',
                 'alignleft aligncenter alignright alignjustify',
                 'outdent indent',

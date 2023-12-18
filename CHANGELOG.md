@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Changed
+- When (re)generating the Default and Full TinyMCE config files, the `styles` item will be used on the toolbar instead of `blocks`
+- By default, the `styles` toolbar item now includes a 'Mark' option, under the 'Inline' submenu
 - Increased the line height of TinyMCE editor content
 
 ## 1.4.5 - 2023-12-12

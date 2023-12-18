@@ -124,7 +124,7 @@ class TinyMCEField {
         // Toolbars
         menubar: false,
         statusbar: false,
-        toolbar: 'undo redo | blocks | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
+        toolbar: 'undo redo | styles | bold italic strikethrough | bullist numlist | insertLink insertImage | hr | code',
 
         // Context menu (the default setting, except replacing the inbuilt link/image options with our own)
         contextmenu: 'craftLink linkchecker craftImage table spellchecker configurepermanentpen',
@@ -134,6 +134,53 @@ class TinyMCEField {
         element_format: 'xhtml',
         entity_encoding: 'raw',
         fix_list_elements: true,
+        // Copying in the entire default `style_formats` here to add mark option to inline submenu,
+        // because using `style_formats_merge` to merge options into submenus doesn't work
+        // Source for defaults: https://www.tiny.cloud/docs/tinymce/6/user-formatting-options/#style_formats
+        style_formats: [
+          {
+            title: 'Headings',
+            items: [
+              { title: 'Heading 1', format: 'h1' },
+              { title: 'Heading 2', format: 'h2' },
+              { title: 'Heading 3', format: 'h3' },
+              { title: 'Heading 4', format: 'h4' },
+              { title: 'Heading 5', format: 'h5' },
+              { title: 'Heading 6', format: 'h6' }
+            ]
+          },
+          {
+            title: 'Inline',
+            items: [
+              { title: 'Bold', format: 'bold' },
+              { title: 'Italic', format: 'italic' },
+              { title: 'Underline', format: 'underline' },
+              { title: 'Strikethrough', format: 'strikethrough' },
+              { title: 'Superscript', format: 'superscript' },
+              { title: 'Subscript', format: 'subscript' },
+              { title: 'Code', format: 'code' },
+              { title: 'Mark', inline: 'mark' }
+            ]
+          },
+          {
+            title: 'Blocks',
+            items: [
+              { title: 'Paragraph', format: 'p' },
+              { title: 'Blockquote', format: 'blockquote' },
+              { title: 'Div', format: 'div' },
+              { title: 'Pre', format: 'pre' }
+            ]
+          },
+          {
+            title: 'Align',
+            items: [
+              { title: 'Left', format: 'alignleft' },
+              { title: 'Center', format: 'aligncenter' },
+              { title: 'Right', format: 'alignright' },
+              { title: 'Justify', format: 'alignjustify' }
+            ]
+          }
+        ],
 
         // Links
         relative_urls: false,
