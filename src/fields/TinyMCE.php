@@ -105,6 +105,14 @@ class TinyMCE extends HtmlField
     /**
      * @inheritdoc
      */
+    public static function icon(): string
+    {
+        return '@spicyweb/tinymce/icon.svg';
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function defineRules(): array
     {
         $rules = parent::defineRules();
@@ -167,7 +175,7 @@ class TinyMCE extends HtmlField
     /**
      * @inheritdoc
      */
-    protected function inputHtml(mixed $value, ?ElementInterface $element = null): string
+    protected function inputHtml(mixed $value, ?ElementInterface $element = null, bool $inline = false): string
     {
         $view = Craft::$app->getView();
         $view->registerAssetBundle(FieldAsset::class);
@@ -337,7 +345,7 @@ class TinyMCE extends HtmlField
     private function _getSectionSources(?ElementInterface $element = null): array
     {
         $sources = [];
-        $sections = Craft::$app->getSections()->getAllSections();
+        $sections = Craft::$app->getEntries()->getAllSections();
         $sites = Craft::$app->getSites()->getAllSites();
         $showSingles = false;
 
