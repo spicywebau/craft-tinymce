@@ -196,6 +196,7 @@ class TinyMCEField {
         selector: `#${this._settings.id}`,
         language: this._settings.language,
         directionality: this._settings.direction,
+        add_unload_trigger: false,
 
         setup: (editor: Editor) => {
           this.editor = editor
@@ -398,11 +399,14 @@ class TinyMCEField {
     const $form = $(this.editor.formElement as HTMLElement)
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
-    const elementEditor: ElementEditor | undefined = $form.data('elementEditor')
+    const elementEditor: ElementEditor | null = $form.data('elementEditor') ?? null
     const contentObserver = new window.MutationObserver(() => {
-      $(this.editor.targetElm).val(this.editor.getContent())
-      const $target = (elementEditor?.isFullPage ?? false) ? Garnish.$bod : $form
-      $target.trigger('change')
+      this.editor.save()
+      $form.trigger('change')
+
+      if (elementEditor === null) {
+        this.editor.isNotDirty = false
+      }
     })
     contentObserver.observe(this.editor.getBody(), {
       characterData: true,
