@@ -1,7 +1,7 @@
 {
   "name": "spicyweb/craft-tinymce",
   "description": "Adds the TinyMCE rich text editor as a Craft CMS field type",
-  "version": "1.4.8",
+  "version": "2.0.0-alpha.1",
   "type": "craft-plugin",
   "keywords": [
     "cms",
@@ -21,8 +21,8 @@
   "support": {
     "issues": "https://github.com/spicywebau/craft-tinymce/issues",
     "source": "https://github.com/spicywebau/craft-tinymce",
-    "docs": "https://github.com/spicywebau/craft-tinymce/blob/1.4.8/README.md",
-    "rss": "https://github.com/spicywebau/craft-tinymce/commits/1.x.atom"
+    "docs": "https://github.com/spicywebau/craft-tinymce/blob/2.0.0-alpha.1/README.md",
+    "rss": "https://github.com/spicywebau/craft-tinymce/commits/2.x.atom"
   },
   "require": {
     "craftcms/cms": "^5.0.0-alpha.11",
@@ -38,8 +38,8 @@
     "handle": "tinymce",
     "name": "TinyMCE Field",
     "class": "spicyweb\\tinymce\\Plugin",
-    "changelogUrl": "https://github.com/spicywebau/craft-tinymce/blob/1.x/CHANGELOG.md",
-    "downloadUrl": "https://github.com/spicywebau/craft-tinymce/archive/refs/tags/1.4.8.zip"
+    "changelogUrl": "https://github.com/spicywebau/craft-tinymce/blob/2.x/CHANGELOG.md",
+    "downloadUrl": "https://github.com/spicywebau/craft-tinymce/archive/refs/tags/2.0.0-alpha.1.zip"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
