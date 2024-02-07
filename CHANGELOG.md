@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed Craft 4 compatibility
 
+## 1.4.9 - 2024-02-07
+
+### Fixed
+- Fixed a bug where editing a link would not trigger a draft autosave
+
 ## 1.4.8 - 2024-02-02
 
 ### Fixed
