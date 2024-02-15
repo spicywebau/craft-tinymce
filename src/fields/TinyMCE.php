@@ -264,10 +264,13 @@ class TinyMCE extends HtmlField
         $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
 
-        return implode('', [
-            '<textarea id="' . $id . '" name="' . $this->handle . '" style="visibility: hidden; position: fixed; top: -9999px">',
-                htmlentities($value, ENT_NOQUOTES, 'UTF-8'),
-            '</textarea>',
+        return Html::textarea($this->handle, $value, [
+            'id' => $id,
+            'style' => [
+                'visibility' => 'hidden',
+                'position' => 'fixed',
+                'top' => '-9999px',
+            ],
         ]);
     }
 

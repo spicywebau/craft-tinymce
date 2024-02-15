@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed Craft 4 compatibility
 
+## 1.4.10 - 2024-02-16
+
+### Fixed
+- Fixed a bug where hash links in TinyMCE fields in Matrix/Neo blocks would incorrectly apply Matrix/Neo field namespacing to the hash value when generating input HTML for element editor pages
+
 ## 1.4.9 - 2024-02-07
 
 ### Fixed
