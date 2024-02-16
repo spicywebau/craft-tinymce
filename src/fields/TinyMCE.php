@@ -32,13 +32,17 @@ SOFTWARE.
 namespace spicyweb\tinymce\fields;
 
 use Craft;
+use craft\base\ElementContainerFieldInterface;
 use craft\base\ElementInterface;
+use craft\base\NestedElementInterface;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
+use craft\elements\NestedElementManager;
+use craft\elements\User;
 use craft\helpers\Html;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
@@ -62,7 +66,7 @@ use yii\base\InvalidArgumentException;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0.0
  */
-class TinyMCE extends HtmlField
+class TinyMCE extends HtmlField implements ElementContainerFieldInterface
 {
     /**
      * @var string|null The TinyMCE config file to use
@@ -100,6 +104,8 @@ class TinyMCE extends HtmlField
      * @var string[] Valid nested entry types for this field.
      */
     private array $_entryTypes = [];
+
+    private NestedElementManager $_entryManager;
 
     /**
      * @inheritdoc
@@ -226,7 +232,7 @@ class TinyMCE extends HtmlField
         $entryTypes = [];
 
         foreach ($this->getEntryTypes() as $entryType) {
-            $entryTypes[$entryType->uid] = $entryType->name;
+            $entryTypes[$entryType->id] = $entryType->name;
         }
 
         $settings = [
@@ -246,6 +252,8 @@ class TinyMCE extends HtmlField
             'editorConfig' => $this->_getEditorConfig(),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,
+            'fieldId' => (string)$this->id,
+            'elementId' => (string)$element->id,
             'elementSiteId' => (string)$elementSite->id,
             'allSites' => $allSites,
             'direction' => $this->getOrientation($element),
@@ -368,6 +376,116 @@ class TinyMCE extends HtmlField
                     : $entriesService->getEntryTypeByUid($type);
             })
             ->all();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFieldLayoutProviders(): array
+    {
+        return $this->getEntryTypes();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUriFormatForElement(NestedElementInterface $element): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRouteForElement(NestedElementInterface $element): mixed
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSupportedSitesForElement(NestedElementInterface $element): array
+    {
+        try {
+            $owner = $element->getOwner();
+        } catch (InvalidConfigException) {
+            $owner = $element->duplicateOf;
+        }
+
+        if (!$owner) {
+            return [Craft::$app->getSites()->getPrimarySite()->id];
+        }
+
+        return $this->_getEntryManager()->getSupportedSiteIds($owner);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canViewElement(NestedElementInterface $element, User $user): ?bool
+    {
+        $owner = $element->getOwner();
+        return $owner && Craft::$app->getElements()->canView($owner, $user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canSaveElement(NestedElementInterface $element, User $user): ?bool
+    {
+        $owner = $element->getOwner();
+        return $owner && Craft::$app->getElements()->canSave($owner, $user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDuplicateElement(NestedElementInterface $element, User $user): ?bool
+    {
+        return $this->canSaveElement($element, $user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDeleteElement(NestedElementInterface $element, User $user): ?bool
+    {
+        return $this->canSaveElement($element, $user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDeleteElementForSite(NestedElementInterface $element, User $user): ?bool
+    {
+        return $this->canSaveElement($element, $user);
+    }
+
+    /**
+     * Gets the nested entry manager.
+     *
+     * @return NestedElementManager
+     */
+    private function _getEntryManager(): NestedElementManager
+    {
+        if (!isset($this->_entryManager)) {
+            $this->_entryManager = new NestedElementManager(
+                Entry::class,
+                fn(ElementInterface $owner) => Entry::find()
+                    ->fieldId($this->id)
+                    ->ownerId($owner?->id ?? null)
+                    ->siteId($owner?->siteId ?? null),
+                [
+                    'field' => $this,
+                    'criteria' => [
+                        'fieldId' => $this->id,
+                    ],
+                ],
+            );
+        }
+
+        return $this->_entryManager;
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array

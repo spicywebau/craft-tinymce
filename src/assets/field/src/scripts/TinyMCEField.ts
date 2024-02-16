@@ -17,8 +17,10 @@ interface FieldSettings {
   defaultTransform: string
   direction: string
   editorConfig: RawEditorOptions
+  elementId: string
   elementSiteId: string
   entryTypes: Record<string, string>
+  fieldId: string
   icons: Record<string, string>
   id: string
   language: string
@@ -398,11 +400,11 @@ class TinyMCEField {
     this.editor.ui.registry.addMenuButton('craftentry', {
       icon: 'craftentry',
       tooltip: Craft.t('tinymce', 'Create an entry'),
-      fetch: (callback) => callback(Object.keys(this._settings.entryTypes).map((uid) => {
+      fetch: (callback) => callback(Object.keys(this._settings.entryTypes).map((id) => {
         return {
           type: 'menuitem',
-          text: this._settings.entryTypes[uid],
-          onAction: () => console.warn('Not implemented')
+          text: this._settings.entryTypes[id],
+          onAction: async () => await this._createEntry(id)
         }
       }))
     })
@@ -639,6 +641,18 @@ class TinyMCEField {
         }
       }
     )
+  }
+
+  private async _createEntry (typeId: string): Promise<any> {
+    const data = {
+      elementType: 'craft\\elements\\Entry',
+      fieldId: this._settings.fieldId,
+      ownerId: this._settings.elementId,
+      siteId: this._settings.elementSiteId,
+      typeId
+    }
+    const response = await Craft.sendActionRequest('POST', 'elements/create', { data })
+    console.log(response)
   }
 }
 
