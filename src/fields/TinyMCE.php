@@ -223,10 +223,26 @@ class TinyMCE extends HtmlField
         $language = Craft::$app->language;
         $translations = $this->_loadTranslations($language);
 
+        $entryTypes = [];
+
+        foreach ($this->getEntryTypes() as $entryType) {
+            $entryTypes[$entryType->uid] = $entryType->name;
+        }
+
         $settings = [
             'id' => $view->namespaceInputId($id),
             'linkOptions' => $this->_getLinkOptions($element),
             'volumes' => $this->_getVolumeKeys(),
+            'entryTypes' => $entryTypes,
+            'icons' => [
+                'craftentry' => Html::modifyTagAttributes(
+                    Html::svg('@app/icons/light/newspaper.svg'),
+                    [
+                        'width' => 24,
+                        'height' => 24,
+                    ],
+                ),
+            ],
             'editorConfig' => $this->_getEditorConfig(),
             'transforms' => $this->_getTransforms(),
             'defaultTransform' => $defaultTransform,

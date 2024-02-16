@@ -18,6 +18,8 @@ interface FieldSettings {
   direction: string
   editorConfig: RawEditorOptions
   elementSiteId: string
+  entryTypes: Record<string, string>
+  icons: Record<string, string>
   id: string
   language: string
   linkOptions: Option[]
@@ -227,6 +229,11 @@ class TinyMCEField {
     }]
     transformOptions.push(...this._settings.transforms)
 
+    // Load any custom icons
+    for (const [iconName, iconSvg] of Object.entries(this._settings.icons)) {
+      this.editor.ui.registry.addIcon(iconName, iconSvg)
+    }
+
     for (const { elementType, optionTitle, sources } of this._settings.linkOptions) {
       const elementTypeHandle = this._commandHandleFromElementType(elementType)
       const menuItemTitle = `${elementTypeHandle}Link`
@@ -385,6 +392,19 @@ class TinyMCEField {
 
         return figure ? 'editImage' : 'image'
       }
+    })
+
+    // Create entry button, for use on the toolbar
+    this.editor.ui.registry.addMenuButton('craftentry', {
+      icon: 'craftentry',
+      tooltip: Craft.t('tinymce', 'Create an entry'),
+      fetch: (callback) => callback(Object.keys(this._settings.entryTypes).map((uid) => {
+        return {
+          type: 'menuitem',
+          text: this._settings.entryTypes[uid],
+          onAction: () => console.warn('Not implemented')
+        }
+      }))
     })
 
     tinymce.addI18n(this._settings.language, this._settings.translations)

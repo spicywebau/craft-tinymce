@@ -30,6 +30,7 @@ return [
     'Copy column' => 'Copy column',
     'Copy row' => 'Copy row',
     'Count' => 'Count',
+    'Create an entry' => 'Create an entry',
     'Custom TinyMCE Config' => 'Custom TinyMCE Config',
     'Cut' => 'Cut',
     'Cut column' => 'Cut column',

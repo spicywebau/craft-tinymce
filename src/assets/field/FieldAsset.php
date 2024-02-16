@@ -39,6 +39,7 @@ class FieldAsset extends AssetBundle
         $view->registerTranslations('tinymce', [
             'Cancel',
             'Caption',
+            'Create an entry',
             'Edit image',
             'Edit link',
             'Insert an image',
