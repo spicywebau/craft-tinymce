@@ -44,7 +44,9 @@ use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\htmlfield\HtmlField;
 use craft\htmlfield\HtmlFieldData;
+use craft\models\EntryType;
 use craft\models\Section;
+use Illuminate\Support\Collection;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
 use spicyweb\tinymce\enums\TinyMCESource;
@@ -95,6 +97,11 @@ class TinyMCE extends HtmlField
     public string $defaultTransform = '';
 
     /**
+     * @var string[] Valid nested entry types for this field.
+     */
+    private array $_entryTypes = [];
+
+    /**
      * @inheritdoc
      */
     public static function displayName(): string
@@ -132,6 +139,18 @@ class TinyMCE extends HtmlField
             },
         ];
         return $rules;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettings(): array
+    {
+        return parent::getSettings() + [
+            'entryTypes' => Collection::make($this->_entryTypes)
+                ->map(fn(EntryType $type) => $type->uid)
+                ->all(),
+        ];
     }
 
     /**
@@ -300,6 +319,39 @@ class TinyMCE extends HtmlField
         }
 
         return parent::serializeValue($value, $element);
+    }
+
+    /**
+     * Gets the valid nested entry types for this field.
+     *
+     * @return EntryType[]
+     * @since 2.0.0
+     */
+    public function getEntryTypes(): array
+    {
+        return $this->_entryTypes;
+    }
+
+    /**
+     * Sets the valid nested entry types for this field.
+     *
+     * @param Array<int|string|EntryType> $entryTypes
+     * @since 2.0.0
+     */
+    public function setEntryTypes(array $entryTypes): void
+    {
+        $entriesService = Craft::$app->getEntries();
+        $this->_entryTypes = Collection::make($entryTypes)
+            ->map(function($type) use ($entriesService) {
+                if ($type instanceof EntryType) {
+                    return $type;
+                }
+
+                return is_numeric($type)
+                    ? $entriesService->getEntryTypeById($type)
+                    : $entriesService->getEntryTypeByUid($type);
+            })
+            ->all();
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array

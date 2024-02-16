@@ -72,6 +72,16 @@ SOFTWARE.
     errors: field.getErrors('manualConfig'),
 }) }}
 
+{{ forms.entryTypeSelectField({
+    label: 'Nested Entry Types'|t('tinymce'),
+    instructions: 'Choose the types of entries that can be nested in this field.'|t('tinymce'),
+    id: 'entry-types',
+    name: 'entryTypes[]',
+    values: field.getEntryTypes(),
+    create: true,
+    errors: field.getErrors('entryTypes'),
+}) }}
+
 {{ forms.checkboxSelectField({
     id: 'availableVolumes',
     name: 'availableVolumes',

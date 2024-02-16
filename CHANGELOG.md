@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- Added `spicyweb\tinymce\fields\TinyMCE::getEntryTypes()`
+- Added `spicyweb\tinymce\fields\TinyMCE::setEntryTypes()`
+
 ### Fixed
 - Fixed an error that occurred when creating a TinyMCE field
 
