@@ -3,10 +3,11 @@
  */
 declare const Craft: {
   cp: Cp
+  createElementEditor: (elementType: string, element: any, settings?: object) => GarnishComponent
   createElementSelectorModal: (elementType: string, settings: object) => GarnishModal
   LivePreview: GarnishComponent
   Preview: GarnishComponent
-  sendActionRequest: (method: string, action: string, options?: object) => Promise<CraftTransformResponse>
+  sendActionRequest: (method: string, action: string, options?: object) => Promise<CraftResponse>
   t: (category: string, message: string, params?: object) => string
 }
 
@@ -18,10 +19,8 @@ interface Cp {
 }
 
 /**
- * A response from Craft's image transform generation.
+ * A response from a Craft action request.
  */
-declare interface CraftTransformResponse {
-  data: {
-    url: string
-  }
+declare interface CraftResponse {
+  data: Record<any, any>
 }

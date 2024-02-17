@@ -629,8 +629,8 @@ class TinyMCEField {
             handle: apiData.transform
           }
           Craft.sendActionRequest('POST', 'assets/generate-transform', { data })
-            .then((response: CraftTransformResponse) => {
-              const url = response.data.url + `#asset:${element.id}:transform:${apiData.transform}`
+            .then((response: CraftResponse) => {
+              const url = (response.data.url as string) + `#asset:${element.id}:transform:${apiData.transform}`
               finishIt(url)
             })
             .catch((_: any) => {
@@ -644,15 +644,24 @@ class TinyMCEField {
   }
 
   private async _createEntry (typeId: string): Promise<any> {
+    const elementType = 'craft\\elements\\Entry'
     const data = {
-      elementType: 'craft\\elements\\Entry',
+      elementType,
       fieldId: this._settings.fieldId,
       ownerId: this._settings.elementId,
       siteId: this._settings.elementSiteId,
       typeId
     }
-    const response = await Craft.sendActionRequest('POST', 'elements/create', { data })
-    console.log(response)
+    const createResponse = await Craft.sendActionRequest('POST', 'elements/create', { data })
+    const slideout = Craft.createElementEditor(elementType, {
+      draftId: createResponse.data.element.draftId,
+      elementId: createResponse.data.element.id,
+      siteId: createResponse.data.element.siteId,
+      params: {
+        fresh: 1
+      }
+    })
+    console.log(slideout)
   }
 }
 
