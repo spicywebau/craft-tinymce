@@ -50,6 +50,7 @@ use craft\htmlfield\HtmlField;
 use craft\htmlfield\HtmlFieldData;
 use craft\models\EntryType;
 use craft\models\Section;
+use HTMLPurifier_Config;
 use Illuminate\Support\Collection;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
@@ -460,6 +461,26 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
     public function canDeleteElementForSite(NestedElementInterface $element, User $user): ?bool
     {
         return $this->canSaveElement($element, $user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function purifierConfig(): HTMLPurifier_Config
+    {
+        $purifierConfig = parent::purifierConfig();
+        $def = $purifierConfig->getHTMLDefinition(true);
+        $def->addElement(
+            'craft-entry',
+            'Block',
+            'Inline',
+            'Common',
+            [
+              'data-entry-id' => 'Number',
+            ]
+        );
+
+        return $purifierConfig;
     }
 
     /**
