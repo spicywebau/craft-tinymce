@@ -444,7 +444,13 @@ class TinyMCEField {
         return {
           type: 'menuitem',
           text: this._settings.entryTypes[id],
-          onAction: async () => await this._createEntry(id)
+          onAction: async () => {
+            try {
+              await this._createEntry(id)
+            } catch (err) {
+              Craft.cp.displayError(err.message)
+            }
+          }
         }
       }))
     })
