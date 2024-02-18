@@ -7,6 +7,7 @@ use craft\base\Model;
 use craft\base\Plugin as BasePlugin;
 use craft\events\RegisterComponentTypesEvent;
 use craft\services\Fields;
+use spicyweb\tinymce\controllers\InputController;
 use spicyweb\tinymce\fields\TinyMCE;
 use spicyweb\tinymce\models\Settings;
 use spicyweb\tinymce\services\ConfigService;
@@ -28,6 +29,13 @@ class Plugin extends BasePlugin
      * @var bool
      */
     public bool $hasCpSettings = true;
+
+    /**
+     * @inheritdoc
+     */
+    public $controllerMap = [
+        'input' => InputController::class,
+    ];
 
     /**
      * @inheritdoc

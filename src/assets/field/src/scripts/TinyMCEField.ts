@@ -113,6 +113,8 @@ backdropObserver.observe(document.body, {
 class TinyMCEField {
   public editor: Editor
 
+  private _cardHtml: Record<string|number, string> = {}
+
   constructor (private readonly _settings: FieldSettings) {
     const settings = this._settings
     const options = Object.assign(
@@ -198,6 +200,15 @@ class TinyMCEField {
         directionality: this._settings.direction,
         add_unload_trigger: false,
 
+        extended_valid_elements: [
+          'craft-entry',
+          this._settings.editorConfig.extended_valid_elements ?? null
+        ].filter((str) => str !== null).join(','),
+        custom_elements: [
+          'craft-entry',
+          this._settings.editorConfig.custom_elements ?? null
+        ].filter((str) => str !== null).join(','),
+
         setup: (editor: Editor) => {
           this.editor = editor
           this._setup()
@@ -230,6 +241,35 @@ class TinyMCEField {
       text: Craft.t('tinymce', 'No transform')
     }]
     transformOptions.push(...this._settings.transforms)
+
+    // Replace entry cards with placeholders in textareas
+    this.editor.on('GetContent', (ev) => {
+      const content = new DOMParser().parseFromString(ev.content, 'text/html').body
+      content.querySelectorAll('.craft-entry-card').forEach((container: HTMLDivElement) => {
+        const card = container.querySelector<HTMLDivElement>('.element.card')
+        const newElement = document.createElement('craft-entry')
+        newElement.setAttribute('data-entry-id', card?.dataset.id ?? '')
+        newElement.textContent = ' '
+        container.replaceWith(newElement)
+      })
+      ev.content = content.innerHTML
+    })
+
+    // Replace placeholders with entry cards in iframe
+    this.editor.on('BeforeSetContent', (ev) => {
+      const content = new DOMParser().parseFromString(ev.content, 'text/html').body
+      content.querySelectorAll('craft-entry').forEach((placeholder: HTMLTextAreaElement) => {
+        if (placeholder.hasAttribute('data-card-html')) {
+          // TODO
+        } else {
+          const newElement = document.createElement('div')
+          newElement.classList.add('craft-entry-card')
+          newElement.innerHTML = this._cardHtml[placeholder.dataset.entryId as string]
+          placeholder.replaceWith(newElement)
+        }
+      })
+      ev.content = content.innerHTML
+    })
 
     // Load any custom icons
     for (const [iconName, iconSvg] of Object.entries(this._settings.icons)) {
@@ -645,23 +685,52 @@ class TinyMCEField {
 
   private async _createEntry (typeId: string): Promise<any> {
     const elementType = 'craft\\elements\\Entry'
-    const data = {
+    const createData = {
       elementType,
       fieldId: this._settings.fieldId,
       ownerId: this._settings.elementId,
       siteId: this._settings.elementSiteId,
       typeId
     }
-    const createResponse = await Craft.sendActionRequest('POST', 'elements/create', { data })
-    const slideout = Craft.createElementEditor(elementType, {
-      draftId: createResponse.data.element.draftId,
-      elementId: createResponse.data.element.id,
-      siteId: createResponse.data.element.siteId,
-      params: {
-        fresh: 1
+    const createResponse = await Craft.sendActionRequest(
+      'POST',
+      'elements/create',
+      {
+        data: createData
       }
-    })
-    console.log(slideout)
+    )
+    Craft
+      .createElementEditor(elementType, {
+        draftId: createResponse.data.element.draftId,
+        elementId: createResponse.data.element.id,
+        siteId: createResponse.data.element.siteId,
+        params: {
+          fresh: 1
+        }
+      })
+      .on('submit', async () => {
+        const cardHtml = await this._loadCardHtml(
+          createResponse.data.element.id,
+          createResponse.data.element.siteId
+        )
+        const selectedContent = this.editor.selection.getContent()
+        const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+
+        this.editor.execCommand(command, false, `<div class="craft-entry-card">${cardHtml}</div>`)
+      })
+  }
+
+  private async _loadCardHtml (entryId: string|number, siteId: string|number): Promise<string> {
+    if (typeof this._cardHtml[entryId] === 'undefined') {
+      const data = {
+        entryId,
+        siteId
+      }
+      const response = await Craft.sendActionRequest('POST', 'tinymce/input/entry-card-html', { data })
+      this._cardHtml[entryId] = response.data.cardHtml
+    }
+
+    return this._cardHtml[entryId]
   }
 }
 
