@@ -257,18 +257,32 @@ class TinyMCEField {
 
     // Replace placeholders with entry cards in iframe
     this.editor.on('BeforeSetContent', (ev) => {
-      const content = new DOMParser().parseFromString(ev.content, 'text/html').body
-      content.querySelectorAll('craft-entry').forEach((placeholder: HTMLTextAreaElement) => {
+      const editorContent = new DOMParser().parseFromString(ev.content, 'text/html').body
+      const textAreaContent = new DOMParser().parseFromString(ev.content, 'text/html').body
+      const textArea = this.editor.getElement() as HTMLTextAreaElement
+
+      editorContent.querySelectorAll('craft-entry').forEach((placeholder: HTMLTextAreaElement) => {
+        const entryId = placeholder.dataset.entryId as string
+        const newElement = document.createElement('div')
+        newElement.classList.add('craft-entry-card')
+
         if (placeholder.hasAttribute('data-card-html')) {
-          // TODO
-        } else {
-          const newElement = document.createElement('div')
-          newElement.classList.add('craft-entry-card')
-          newElement.innerHTML = this._cardHtml[placeholder.dataset.entryId as string]
-          placeholder.replaceWith(newElement)
+          this._cardHtml[entryId] = new DOMParser()
+            .parseFromString(placeholder.dataset.cardHtml as string, 'text/html')
+            .body
+            .textContent as string
+
+          // Ensure the card HTML is removed from the textarea
+          textAreaContent.querySelector(`craft-entry[data-entry-id="${entryId}"]`)
+            ?.removeAttribute('data-card-html')
         }
+
+        newElement.innerHTML = this._cardHtml[entryId]
+        placeholder.replaceWith(newElement)
       })
-      ev.content = content.innerHTML
+
+      ev.content = editorContent.innerHTML
+      textArea.value = textAreaContent.innerHTML
     })
 
     // Load any custom icons

@@ -43,6 +43,8 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\NestedElementManager;
 use craft\elements\User;
+use craft\events\DuplicateNestedElementsEvent;
+use craft\helpers\Cp;
 use craft\helpers\Html;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
@@ -307,6 +309,31 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
 
         $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
         $value = $this->prepValueForInput($value, $element);
+        $value = preg_replace_callback(
+            '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+            function($matches) use ($element) {
+                $entryId = (int)$matches[1];
+                $entry = Entry::find()
+                    ->id($entryId)
+                    ->ownerId($element?->id)
+                    ->siteId($element?->siteId)
+                    ->one();
+
+                if ($entry === null) {
+                    return '';
+                }
+
+                return Html::tag(
+                    'craft-entry',
+                    ' ',
+                    [
+                        'data-entry-id' => $entryId,
+                        'data-card-html' => Html::encode(Cp::elementCardHtml($entry, [])),
+                    ],
+                );
+            },
+            $value
+        );
 
         return Html::textarea($this->handle, $value, [
             'id' => $id,
@@ -344,6 +371,55 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         }
 
         return parent::serializeValue($value, $element);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterElementPropagate(ElementInterface $element, bool $isNew): void
+    {
+        $this->_getEntryManager()->maintainNestedElements($element, $isNew);
+        parent::afterElementPropagate($element, $isNew);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeElementDelete(ElementInterface $element): bool
+    {
+        if (!parent::beforeElementDelete($element)) {
+            return false;
+        }
+
+        $this->_getEntryManager()->deleteNestedElements($element, $element->hardDelete);
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeElementDeleteForSite(ElementInterface $element): bool
+    {
+        $elementsService = Craft::$app->getElements();
+
+        Entry::find()
+            ->primaryOwnerId($element->id)
+            ->status(null)
+            ->siteId($element->siteId)
+            ->collect()
+            ->each(fn($entry) => $elementsService->deleteElementForSite($entry));
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterElementRestore(ElementInterface $element): void
+    {
+        $this->_getEntryManager()->restoreNestedElements($element);
+        parent::afterElementRestore($element);
     }
 
     /**
@@ -504,9 +580,47 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
                     ],
                 ],
             );
+
+            $this->_entryManager->on(
+                NestedElementManager::EVENT_AFTER_CREATE_REVISIONS,
+                fn(DuplicateNestedElementsEvent $event) => $this->_replaceEntryIds($event),
+            );
+
+            $this->_entryManager->on(
+                NestedElementManager::EVENT_AFTER_DUPLICATE_NESTED_ELEMENTS,
+                fn(DuplicateNestedElementsEvent $event) => $this->_replaceEntryIds($event),
+            );
         }
 
         return $this->_entryManager;
+    }
+
+    private function _replaceEntryIds(DuplicateNestedElementsEvent $event): void
+    {
+        if (($fieldValue = $event->target->getFieldValue($this->handle)) !== null) {
+            $value = preg_replace_callback(
+                '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+                function($matches) use ($event) {
+                    $oldEntryId = (int)$matches[1];
+
+                    if (!isset($event->newElementIds[$oldEntryId])) {
+                        return '';
+                    }
+
+                    return Html::tag(
+                        'craft-entry',
+                        ' ',
+                        [
+                            'data-entry-id' => $event->newElementIds[$oldEntryId],
+                        ],
+                    );
+                },
+                $fieldValue->getRawContent(),
+            );
+
+            $event->target->setFieldValue($this->handle, $value);
+            Craft::$app->getElements()->saveElement($event->target);
+        }
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array
