@@ -206,7 +206,7 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
     protected function inputHtml(mixed $value, ?ElementInterface $element = null, bool $inline = false): string
     {
         $view = Craft::$app->getView();
-        $view->registerAssetBundle(FieldAsset::class);
+        $fieldAssetBundle = $view->registerAssetBundle(FieldAsset::class);
 
         $id = Html::id($this->handle);
         $sitesService = Craft::$app->getSites();
@@ -267,7 +267,13 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         // Load the editor from wherever it should be loaded based on the plugin settings
         switch ($pluginSettings->nonNullTinymceSource()) {
             case TinyMCESource::Default:
-                $view->registerAssetBundle(TinyMCEAsset::class);
+                $tinyAssetBundle = $view->registerAssetBundle(TinyMCEAsset::class);
+
+                if (!isset($settings['editorConfig']['base_url'])) {
+                    $settings['editorConfig']['base_url'] = $tinyAssetBundle->baseUrl;
+                    $settings['editorConfig']['suffix'] = '.min';
+                }
+
                 break;
             case TinyMCESource::TinyCloud:
                 $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
@@ -300,8 +306,6 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
             default:
                 throw new InvalidSourceException('Invalid `tinymceSource` setting set');
         }
-
-        $fieldAssetBundle = $view->registerAssetBundle(FieldAsset::class);
 
         if (!isset($settings['editorConfig']['skin_url'])) {
             $settings['editorConfig']['skin_url'] = $fieldAssetBundle->baseUrl . DIRECTORY_SEPARATOR . 'styles';
