@@ -12,3 +12,144 @@ body {
 table {
     border-collapse: collapse;
 }
+
+// Nested entry card styling
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px;
+    cursor: default;
+    user-select: none;
+    border-radius: 5px;
+    background-color: rgb(243, 247, 252);
+    color: rgb(63, 77, 90);
+
+    .label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        overflow: hidden;
+
+        .label-link {
+            flex: 1 1 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+
+.card-content {
+    position: relative;
+    display: flex;
+    flex: 1 0 0 !important;
+    flex-direction: column;
+    gap: 4px;
+    margin: calc((1rem - 1.42em)/2) 0;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+.card-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    .label {
+        font-weight: 600;
+
+        a {
+            color: #1f5fea;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    }
+}
+
+.card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+
+    > * {
+        margin: 0;
+        max-height: 2.84em;
+        overflow: hidden;
+        text-wrap: pretty;
+    }
+}
+
+.card-actions-container {
+    position: relative;
+    display: flex;
+    align-items: flex-start !important;
+
+    .card-actions {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        gap: 8px;
+        min-height: 1rem;
+
+        .status {
+            position: relative;
+            display: inline-block;
+            margin: 0;
+            background-clip: border-box;
+            border: 1px solid transparent;
+            border-radius: 100%;
+            box-sizing: border-box;
+            height: 0.75rem;
+            width: 0.75rem;
+        }
+
+        .status:not(.on):not(.live):not(.active):not(.enabled):not(.all) {
+            &:not(.pending):not(.warning):not(.off):not(.suspended):not(.expired) {
+            &:not(.light):not(.gray):not(.red):not(.orange):not(.amber):not(.yellow) {
+                &:not(.lime):not(.green):not(.emerald):not(.teal):not(.cyan):not(.sky) {
+                &:not(.blue):not(.indigo):not(.violet):not(.purple):not(.fuchsia) {
+                    &:not(.pink):not(.rose):not(.grey):not(.black) {
+                    border-color: rgb(89, 102, 115);
+                    }
+                }
+                }
+            }
+            }
+        }
+
+        .status.all {
+            background-image: linear-gradient(60deg, #184cef, #e5422b);
+            background-origin: border-box;
+        }
+
+        .status.on,
+        .status.live,
+        .status.active,
+        .status.enabled {
+            background-color: rgb(17, 166, 151);;
+        }
+
+        .status.red,
+        .bg-red,
+        .status.off,
+        .status.suspended,
+        .status.expired {
+            background-color: rgb(220, 38, 38);
+        }
+
+        .status.warning {
+            background-color: rgb(180, 83, 9);
+        }
+
+        .status.orange,
+        .bg-orange,
+        .status.pending {
+            background-color: rgb(251, 146, 60);
+        }
+    }
+}

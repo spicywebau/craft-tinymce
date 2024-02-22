@@ -202,6 +202,7 @@ class TinyMCEField {
 
         extended_valid_elements: [
           'craft-entry',
+          '#span[class]',
           this._settings.editorConfig.extended_valid_elements ?? null
         ].filter((str) => str !== null).join(','),
         custom_elements: [
