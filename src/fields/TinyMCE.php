@@ -312,9 +312,8 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         }
 
         $view->registerJs('TinyMCE.init(' . Json::encode($settings) . ');');
-        $value = $this->prepValueForInput($value, $element);
-        $value = preg_replace_callback(
-            '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+        $value = $this->_replaceEntryPlaceholder(
+            $this->prepValueForInput($value, $element),
             function($matches) use ($element) {
                 $entryId = (int)$matches[1];
                 $entry = Entry::find()
@@ -336,7 +335,6 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
                     ],
                 );
             },
-            $value
         );
 
         return Html::textarea($this->handle, $value, [
@@ -354,11 +352,31 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
      */
     public function getStaticHtml(mixed $value, ElementInterface $element): string
     {
-        return implode('', [
-            '<div class="text">',
-                ($this->prepValueForInput($value, $element) ?: '&nbsp;'),
-            '</div>',
-        ]);
+        return Html::tag(
+            'div',
+            $this->_replaceEntryPlaceholder(
+                $this->prepValueForInput($value, $element) ?: '&nbsp;',
+                function($matches) use($element) {
+                    $entryId = (int)$matches[1];
+                    $entry = Entry::find()
+                        ->id($entryId)
+                        ->ownerId($element?->id)
+                        ->siteId($element?->siteId)
+                        ->drafts($element?->getIsDraft())
+                        ->revisions($element?->getIsRevision())
+                        ->one();
+
+                    if ($entry === null) {
+                        return '';
+                    }
+
+                    return Cp::elementCardHtml($entry, []);
+                }
+            ),
+            [
+                'class' => 'text',
+            ],
+        );
     }
 
     /**
@@ -602,8 +620,8 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
     private function _replaceEntryIds(DuplicateNestedElementsEvent $event): void
     {
         if (($fieldValue = $event->target->getFieldValue($this->handle)) !== null) {
-            $value = preg_replace_callback(
-                '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+            $value = $this->_replaceEntryPlaceholder(
+                $fieldValue->getRawContent(),
                 function($matches) use ($event) {
                     $oldEntryId = (int)$matches[1];
 
@@ -619,12 +637,20 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
                         ],
                     );
                 },
-                $fieldValue->getRawContent(),
             );
 
             $event->target->setFieldValue($this->handle, $value);
             Craft::$app->getElements()->saveElement($event->target);
         }
+    }
+
+    private function _replaceEntryPlaceholder(string $content, callable $replaceFn): string
+    {
+        return preg_replace_callback(
+            '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+            fn($matches) => $replaceFn($matches),
+            $content,
+        );
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array
