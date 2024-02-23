@@ -247,9 +247,8 @@ class TinyMCEField {
     this.editor.on('GetContent', (ev) => {
       const content = new DOMParser().parseFromString(ev.content, 'text/html').body
       content.querySelectorAll('.craft-entry-card').forEach((container: HTMLDivElement) => {
-        const card = container.querySelector<HTMLDivElement>('.element.card')
         const newElement = document.createElement('craft-entry')
-        newElement.setAttribute('data-entry-id', card?.dataset.id ?? '')
+        newElement.setAttribute('data-entry-id', container?.dataset.entryId ?? '')
         newElement.textContent = ' '
         container.replaceWith(newElement)
       })
@@ -266,6 +265,8 @@ class TinyMCEField {
         const entryId = placeholder.dataset.entryId as string
         const newElement = document.createElement('div')
         newElement.classList.add('craft-entry-card')
+        newElement.setAttribute('data-entry-id', entryId)
+        newElement.setAttribute('contenteditable', 'false')
 
         if (placeholder.hasAttribute('data-card-html')) {
           this._cardHtml[entryId] = new DOMParser()
@@ -720,24 +721,25 @@ class TinyMCEField {
         data: createData
       }
     )
+    const entryId = createResponse.data.element.id as number
     Craft
       .createElementEditor(elementType, {
         draftId: createResponse.data.element.draftId,
-        elementId: createResponse.data.element.id,
+        elementId: entryId,
         siteId: createResponse.data.element.siteId,
         params: {
           fresh: 1
         }
       })
       .on('submit', async () => {
-        const cardHtml = await this._loadCardHtml(
-          createResponse.data.element.id,
+        await this._loadCardHtml(
+          entryId,
           createResponse.data.element.siteId
         )
         const selectedContent = this.editor.selection.getContent()
         const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
 
-        this.editor.execCommand(command, false, `<div class="craft-entry-card">${cardHtml}</div>`)
+        this.editor.execCommand(command, false, `<craft-entry data-entry-id="${entryId}"></craft-entry>`)
       })
   }
 
