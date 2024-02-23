@@ -133,6 +133,14 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
     /**
      * @inheritdoc
      */
+    public static function isMultiInstance(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function defineRules(): array
     {
         $rules = parent::defineRules();
