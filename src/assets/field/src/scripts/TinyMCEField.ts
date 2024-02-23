@@ -582,6 +582,19 @@ class TinyMCEField {
         }
       })
     }
+
+    // Dismiss the overflow toolbar on fields in a slideout when the slideout is closed
+    if (typeof Craft.ElementEditorSlideout !== 'undefined') {
+      Garnish.on(Craft.ElementEditorSlideout, 'beforeClose', (event: CraftSlideoutEvent) => {
+        const $slideoutContainer: JQuery<HTMLDivElement> = event.target.$container
+        const editorContainer = this.editor.getContainer()
+
+        if ($slideoutContainer[0].contains(editorContainer)) {
+          // TODO: is there a TinyMCE API call we can make here instead of simulating a click?
+          editorContainer.querySelector<HTMLButtonElement>('.tox-tbtn--enabled')?.click()
+        }
+      })
+    }
   }
 
   private _initFocus (): void {

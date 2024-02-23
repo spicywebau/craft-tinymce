@@ -5,6 +5,7 @@ declare const Craft: {
   cp: Cp
   createElementEditor: (elementType: string, element: any, settings?: object) => GarnishComponent
   createElementSelectorModal: (elementType: string, settings: object) => GarnishModal
+  ElementEditorSlideout: GarnishComponent
   LivePreview: GarnishComponent
   Preview: GarnishComponent
   sendActionRequest: (method: string, action: string, options?: object) => Promise<CraftResponse>
@@ -23,4 +24,8 @@ interface Cp {
  */
 declare interface CraftResponse {
   data: Record<any, any>
+}
+
+declare interface CraftSlideoutEvent extends Event {
+  target: any
 }
