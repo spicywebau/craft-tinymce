@@ -35,14 +35,18 @@ use Craft;
 use craft\base\ElementContainerFieldInterface;
 use craft\base\ElementInterface;
 use craft\base\NestedElementInterface;
+use craft\behaviors\EventBehavior;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\db\ElementQuery;
+use craft\elements\db\EntryQuery;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\NestedElementManager;
 use craft\elements\User;
+use craft\events\CancelableEvent;
 use craft\events\DuplicateNestedElementsEvent;
 use craft\helpers\Cp;
 use craft\helpers\Html;
@@ -591,12 +595,19 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         if (!isset($this->_entryManager)) {
             $this->_entryManager = new NestedElementManager(
                 Entry::class,
-                fn(ElementInterface $owner) => Entry::find()
-                    ->fieldId($this->id)
-                    ->ownerId($owner?->id ?? null)
-                    ->siteId($owner?->siteId ?? null),
+                fn(ElementInterface $owner) => $this->_createEntryQuery($owner),
                 [
                     'field' => $this,
+                    'valueGetter' => function(ElementInterface $owner, bool $fetchAll = false) {
+                        $value = $owner->getFieldValue($this->handle);
+                        preg_match_all(
+                            '/<craft-entry data-entry-id="([0-9]+)">\s?<\\/craft-entry>/i',
+                            $owner->getFieldValue($this->handle),
+                            $entryIds,
+                        );
+                        return $this->_createEntryQuery($owner)->id($entryIds[1]);
+                    },
+                    'valueSetter' => false,
                     'criteria' => [
                         'fieldId' => $this->id,
                     ],
@@ -615,6 +626,46 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         }
 
         return $this->_entryManager;
+    }
+
+    private function _createEntryQuery(?ElementInterface $owner): EntryQuery
+    {
+        $query = Entry::find();
+
+        // Existing element?
+        if ($owner && $owner->id) {
+            $query->attachBehavior(self::class, new EventBehavior([
+                ElementQuery::EVENT_BEFORE_PREPARE => function(
+                    CancelableEvent $event,
+                    EntryQuery $query,
+                ) use ($owner) {
+                    $query->ownerId = $owner->id;
+
+                    // Clear out id=false if this query was populated previously
+                    if ($query->id === false) {
+                        $query->id = null;
+                    }
+
+                    // If the owner is a revision, allow revision entries to be returned as well
+                    if ($owner->getIsRevision()) {
+                        $query
+                            ->revisions(null)
+                            ->trashed(null);
+                    }
+                },
+            ], true));
+
+            // Prepare the query for lazy eager loading
+            $query->prepForEagerLoading($this->handle, $owner);
+        } else {
+            $query->id = false;
+        }
+
+        $query
+            ->fieldId($this->id)
+            ->siteId($owner->siteId ?? null);
+
+        return $query;
     }
 
     private function _replaceEntryIds(DuplicateNestedElementsEvent $event): void
