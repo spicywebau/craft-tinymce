@@ -115,6 +115,8 @@ class TinyMCEField {
 
   private _cardHtml: Record<string|number, string> = {}
 
+  private readonly _elementType = 'craft\\elements\\Entry'
+
   constructor (private readonly _settings: FieldSettings) {
     const settings = this._settings
     const options = Object.assign(
@@ -476,6 +478,13 @@ class TinyMCEField {
 
   private _init (options: Object): void {
     this._initFocus()
+    this._initEntryCards()
+    const contentObserver = new window.MutationObserver(() => this._initEntryCards())
+    contentObserver.observe(this.editor.getBody(), {
+      characterData: true,
+      childList: true,
+      subtree: true
+    })
     const $form = $(this.editor.formElement as HTMLElement)
 
     // Update the form value on any content change, and trigger a change event so drafts can autosave
@@ -516,6 +525,7 @@ class TinyMCEField {
         options
       })
       this._initFocus()
+      this._initEntryCards()
     }
 
     if (typeof Craft.Preview !== 'undefined') {
@@ -577,6 +587,24 @@ class TinyMCEField {
   private _initFocus (): void {
     this.editor.on('focus', (_: EditorEvent<any>) => this.editor.container.classList.add('mce-focused'))
     this.editor.on('blur', (_: EditorEvent<any>) => this.editor.container.classList.remove('mce-focused'))
+  }
+
+  private _initEntryCards (ids?: number[]): void {
+    this.editor.getBody()
+      .querySelectorAll<HTMLDivElement>('.craft-entry-card:not(.initialised)')
+      .forEach((card) => this._initEntryCard(card))
+  }
+
+  private _initEntryCard (card: HTMLDivElement): void {
+    const listener: () => void = async () => {
+      try {
+        await this._editEntry(card.dataset.entryId as string)
+      } catch (err) {
+        Craft.cp.displayError(err.message)
+      }
+    }
+    card.addEventListener('dblclick', listener)
+    card.classList.add('initialised')
   }
 
   private _linkDialogConfig (title: string, enforceReplace: boolean, initialData: object): any {
@@ -706,9 +734,8 @@ class TinyMCEField {
   }
 
   private async _createEntry (typeId: string): Promise<any> {
-    const elementType = 'craft\\elements\\Entry'
     const createData = {
-      elementType,
+      elementType: this._elementType,
       fieldId: this._settings.fieldId,
       ownerId: this._settings.elementId,
       siteId: this._settings.elementSiteId,
@@ -722,29 +749,52 @@ class TinyMCEField {
       }
     )
     const entryId = createResponse.data.element.id as number
+
+    return await this._editEntry(entryId, createResponse.data.element.siteId, {
+      draftId: createResponse.data.element.draftId,
+      siteId: createResponse.data.element.siteId,
+      params: {
+        fresh: 1
+      }
+    })
+  }
+
+  private async _editEntry (
+    entryId: string|number,
+    siteId?: string|number,
+    criteria?: Record<string, any>
+  ): Promise<any> {
+    criteria = {
+      ...criteria,
+      elementId: entryId ?? criteria?.elementId ?? null,
+      siteId: siteId ?? criteria?.siteId ?? null
+    }
     Craft
-      .createElementEditor(elementType, {
-        draftId: createResponse.data.element.draftId,
-        elementId: entryId,
-        siteId: createResponse.data.element.siteId,
-        params: {
-          fresh: 1
-        }
-      })
+      .createElementEditor(this._elementType, criteria)
       .on('submit', async () => {
-        await this._loadCardHtml(
-          entryId,
-          createResponse.data.element.siteId
-        )
+        const existingCard = this.editor.getBody()
+          .querySelector(`.craft-entry-card[data-entry-id="${entryId}"]`)
+        const enforceReplace = existingCard !== null
+        await this._loadCardHtml(entryId, siteId, enforceReplace)
         const selectedContent = this.editor.selection.getContent()
-        const command = selectedContent.length > 0 ? 'mceReplaceContent' : 'mceInsertContent'
+        const command = existingCard !== null || selectedContent.length > 0
+          ? 'mceReplaceContent'
+          : 'mceInsertContent'
+
+        if (enforceReplace) {
+          this.editor.selection.select(existingCard)
+        }
 
         this.editor.execCommand(command, false, `<craft-entry data-entry-id="${entryId}"></craft-entry>`)
       })
   }
 
-  private async _loadCardHtml (entryId: string|number, siteId: string|number): Promise<string> {
-    if (typeof this._cardHtml[entryId] === 'undefined') {
+  private async _loadCardHtml (
+    entryId: string|number,
+    siteId?: string|number,
+    force: boolean = false
+  ): Promise<string> {
+    if (force || typeof this._cardHtml[entryId] === 'undefined') {
       const data = {
         entryId,
         siteId

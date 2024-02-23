@@ -25,7 +25,7 @@ class InputController extends Controller
         $view = Craft::$app->getView();
         $request = Craft::$app->getRequest();
         $entryId = $request->getRequiredBodyParam('entryId');
-        $siteId = $request->getRequiredBodyParam('siteId');
+        $siteId = $request->getBodyParam('siteId', Craft::$app->getSites()->getCurrentSite()->id);
         $entry = Entry::find()
             ->id($entryId)
             ->siteId($siteId)
