@@ -5,27 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 2.0.0 - 2024-04-07
+
+### Added
+- Added Craft 5 compatibility
 
 ### Changed
 - Updated the distributed TinyMCE to 7.0.0
 - `spicyweb\tinymce\enums\TinyMCESource` is now a proper enum, rather than an abstract class
-
-## 2.0.0-beta.1 - 2024-02-20
-
-### Fixed
-- Fixed an error that occurred when creating a TinyMCE field
-- Fixed a bug where, if no TinyMCE fields existed on an element editor page, TinyMCE fields would not load on slideout editors
-
-## 2.0.0-alpha.2 - 2024-02-07
-
-### Fixed
-- Fixed a bug where editing a link would not trigger a draft autosave
-
-## 2.0.0-alpha.1 - 2024-02-02
-
-### Added
-- Added Craft 5 compatibility
 
 ### Removed
 - Removed Craft 4 compatibility
