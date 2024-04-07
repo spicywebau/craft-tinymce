@@ -4,6 +4,7 @@
 declare const Craft: {
   cp: Cp
   createElementSelectorModal: (elementType: string, settings: object) => GarnishModal
+  ElementEditorSlideout: GarnishComponent
   LivePreview: GarnishComponent
   Preview: GarnishComponent
   sendActionRequest: (method: string, action: string, options?: object) => Promise<CraftTransformResponse>
@@ -24,4 +25,8 @@ declare interface CraftTransformResponse {
   data: {
     url: string
   }
+}
+
+declare interface CraftSlideoutEvent extends Event {
+  target: any
 }
