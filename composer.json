@@ -25,7 +25,7 @@
     "rss": "https://github.com/spicywebau/craft-tinymce/commits/1.x.atom"
   },
   "require": {
-    "craftcms/cms": "^4.2.0",
+    "craftcms/cms": "^4.8.0",
     "craftcms/html-field": "^2.0.0",
     "php": "^8.0.2"
   },
