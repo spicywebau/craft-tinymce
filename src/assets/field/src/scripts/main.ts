@@ -1,3 +1,8 @@
+/**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
+
 import { FieldSettings, TinyMCEField } from './TinyMCEField'
 
 declare global {

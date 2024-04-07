@@ -1,4 +1,9 @@
 /**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
+
+/**
  * An instance of Craft.
  */
 declare const Craft: {

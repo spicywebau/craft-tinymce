@@ -29,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed Craft 4 compatibility
 
+## 1.5.0 - 2024-04-07
+
+### Changed
+- TinyMCE Field is now released under the GPL-3.0 license
+- TinyMCE Field now requires Craft 4.8.0 or later
+- Updated the distributed TinyMCE to 6.8.3
+
 ## 1.4.10 - 2024-02-16
 
 ### Fixed
