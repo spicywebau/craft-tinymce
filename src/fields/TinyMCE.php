@@ -223,7 +223,7 @@ class TinyMCE extends HtmlField
         ];
 
         // Load the editor from wherever it should be loaded based on the plugin settings
-        switch ($pluginSettings->nonNullTinymceSource()) {
+        switch ($pluginSettings->tinymceSource) {
             case TinyMCESource::Default:
                 $tinyAssetBundle = $view->registerAssetBundle(TinyMCEAsset::class);
 
@@ -248,7 +248,7 @@ class TinyMCE extends HtmlField
                 $customSource = $pluginSettings->tinymceCustomSource;
 
                 if (empty($customSource)) {
-                    throw new InvalidSourceException('`tinymceCustomSource` not set when `tinymceSource` set to ' . TinyMCESource::Custom);
+                    throw new InvalidSourceException('`tinymceCustomSource` not set when `tinymceSource` set to ' . TinyMCESource::Custom->value);
                 }
 
                 $view->registerJsFile(UrlHelper::url($customSource), [

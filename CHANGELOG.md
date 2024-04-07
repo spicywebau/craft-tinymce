@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated the distributed TinyMCE to 7.0.0
+- `spicyweb\tinymce\enums\TinyMCESource` is now a proper enum, rather than an abstract class
 
 ## 2.0.0-beta.1 - 2024-02-20
 

@@ -8,6 +8,7 @@ namespace spicyweb\tinymce\models;
 
 use craft\base\Model;
 use spicyweb\tinymce\enums\TinyMCESource;
+use yii\base\ArrayableTrait;
 
 /**
  * Class Settings
@@ -18,6 +19,10 @@ use spicyweb\tinymce\enums\TinyMCESource;
  */
 class Settings extends Model
 {
+    use ArrayableTrait {
+        toArray as traitToArray;
+    }
+
     /**
      * @var string|null The API key to use when using Tiny Cloud.
      */
@@ -30,39 +35,68 @@ class Settings extends Model
     public bool $enablePremiumPlugins = false;
 
     /**
-     * @var string|null
+     * @var TinyMCESource
      * @since 1.4.0
-     * @see nonNullTinymceSource()
      */
-    public ?string $tinymceSource = null;
+    public TinyMCESource $tinymceSource = TinyMCESource::Default;
 
     /**
-     * @var string|null The URL to load TinyMCE from, if [[nonNullTinymceSource()]] returns `custom`.
+     * @var string|null The URL to load TinyMCE from, if [[$tinymceSource]] is `TinyMCESource::Custom`.
      * @since 1.4.0
      */
     public ?string $tinymceCustomSource = null;
 
     /**
-     * @var string Where TinyMCE will be loaded from.
-     *
-     * If [[tinymceSource]] is not null, this will return one of the following:
-     *
-     * - `default` – Load the distributed version of TinyMCE
-     * - `tinyCloud` – Load TinyMCE from the Tiny Cloud CDN - make sure to also set [[editorCloudApiKey]] when using this
-     * - `custom` – Load TinyMCE from the URL set for [[tinymceCustomSource]]
-     *
-     * If [[tinymceSource]] is null, this will return either `default` or `tinyCloud`, depending on whether
-     * [[editorCloudApiKey]] is set.
-     *
-     * @since 1.4.0
+     * @inheritdoc
      */
-    public function nonNullTinymceSource(): string
+    public function toArray(array $fields = [], array $expand = [], $recursive = true): array
     {
-        // Ensure Tiny Cloud users from prior to the tinymceSource setting being added will default to tinyCloud
-        if ($this->tinymceSource === null) {
-            return $this->editorCloudApiKey !== null ? TinyMCESource::TinyCloud : TinyMCESource::Default;
+        $array = $this->traitToArray($fields, $expand, $recursive);
+
+        if (isset($array['tinymceSource'])) {
+            $array['tinymceSource'] = $array['tinymceSource']['value'];
         }
 
-        return $this->tinymceSource;
+        return $array;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributes($values, $safeOnly = true): void
+    {
+        if (isset($values['tinymceSource'])) {
+            if (is_string($values['tinymceSource'])) {
+                // Ensure strings are converted to `TinyMCESource`
+                $values['tinymceSource'] = TinyMCESource::tryFrom($values['tinymceSource']);
+            }
+
+            // Ensure Tiny Cloud users from prior to the tinymceSource setting being added will default to Tiny Cloud
+            if ($values['tinymceSource'] === null) {
+                $values['tinymceSource'] = $tinymceCustomSource !== null
+                    ? TinyMCESource::TinyCloud
+                    : TinyMCESource::Default;
+            }
+        }
+
+        parent::setAttributes($values, $safeOnly);
+    }
+
+    // Just here to prevent errors
+
+    /**
+     * @inheritdoc
+     */
+    public function fields(): array
+    {
+        return parent::fields();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields(): array
+    {
+        return parent::extraFields();
     }
 }
