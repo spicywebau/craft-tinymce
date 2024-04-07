@@ -6,7 +6,7 @@
   "main": "client/src/main.ts",
   "repository": "https://github.com/spicywebau/craft-tinymce.git",
   "author": "Spicy Web <plugins@spicyweb.com.au>",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "build": "./node_modules/.bin/ts-standard && ./node_modules/.bin/webpack"
   },

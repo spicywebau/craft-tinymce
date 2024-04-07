@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Changed
+- TinyMCE Field is now released under the GPL-3.0 license
 - Updated the distributed TinyMCE to 6.8.3
 
 ## 1.4.10 - 2024-02-16

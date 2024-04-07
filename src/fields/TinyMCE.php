@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
 
 /*
 This class is based on the Redactor field class from the Redactor plugin version 3.0.2, by Pixel & Tonic, Inc.

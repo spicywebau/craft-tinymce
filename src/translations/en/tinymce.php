@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
 
 return [
     'Add your API key to use the cloud version of TinyMCE.' => 'Add your API key to use the cloud version of TinyMCE.',
