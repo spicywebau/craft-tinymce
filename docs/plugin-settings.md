@@ -4,19 +4,21 @@ TinyMCE Field includes plugin settings to control where TinyMCE is loaded from, 
 
 ## `tinymceSource`
 
-Where TinyMCE will be loaded from. The valid options are:
+Where TinyMCE will be loaded from.
 
-- `'default'` – Load the version of TinyMCE distributed with the plugin (6.5.1)
-- `'tinyCloud'` – Load TinyMCE from the Tiny Cloud CDN - make sure to also set `editorCloudApiKey` when using this
-- `'custom'` – Load TinyMCE from the URL set for `tinymceCustomSource`
+This setting is of type [`TinyMCESource`](https://github.com/spicywebau/craft-tinymce/blob/2.x/src/enums/TinyMCESource.php). The valid options are:
+
+- `TinyMCESource::Default` – Load the version of TinyMCE distributed with the plugin (7.0.0)
+- `TinyMCESource::TinyCloud` – Load TinyMCE from the Tiny Cloud CDN - make sure to also set `editorCloudApiKey` when using this
+- `TinyMCESource::Custom` – Load TinyMCE from the URL set for `tinymceCustomSource`
 
 ## `tinymceCustomSource`
 
-The URL to load TinyMCE from if `tinymceSource` is set to `'custom'`.
+The URL to load TinyMCE from if `tinymceSource` is set to `TinyMCESource::Custom`.
 
 ## `editorCloudApiKey`
 
-The API key to use if `tinymceSource` is set to `'tinyCloud'`, or `enablePremiumPlugins` is `true`.
+The API key to use if `tinymceSource` is set to `TinyMCESource::TinyCloud`, or `enablePremiumPlugins` is `true`.
 
 ## `enablePremiumPlugins`
 

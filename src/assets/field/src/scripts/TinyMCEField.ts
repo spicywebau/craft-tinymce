@@ -1,3 +1,8 @@
+/**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
+
 import * as $ from 'jquery'
 import { Editor, EditorEvent, RawEditorOptions, TinyMCE } from 'tinymce'
 

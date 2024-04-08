@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
 
 /*
 This class is based on the Redactor field class from the Redactor plugin version 3.0.2, by Pixel & Tonic, Inc.
@@ -277,7 +281,7 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
         ];
 
         // Load the editor from wherever it should be loaded based on the plugin settings
-        switch ($pluginSettings->nonNullTinymceSource()) {
+        switch ($pluginSettings->tinymceSource) {
             case TinyMCESource::Default:
                 $tinyAssetBundle = $view->registerAssetBundle(TinyMCEAsset::class);
 
@@ -302,7 +306,7 @@ class TinyMCE extends HtmlField implements ElementContainerFieldInterface
                 $customSource = $pluginSettings->tinymceCustomSource;
 
                 if (empty($customSource)) {
-                    throw new InvalidSourceException('`tinymceCustomSource` not set when `tinymceSource` set to ' . TinyMCESource::Custom);
+                    throw new InvalidSourceException('`tinymceCustomSource` not set when `tinymceSource` set to ' . TinyMCESource::Custom->value);
                 }
 
                 $view->registerJsFile(UrlHelper::url($customSource), [

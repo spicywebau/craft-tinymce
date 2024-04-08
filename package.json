@@ -1,12 +1,12 @@
 {
   "name": "craft-tinymce",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0",
   "description": "Adds the TinyMCE rich text editor as a Craft CMS field type",
   "private": true,
   "main": "client/src/main.ts",
   "repository": "https://github.com/spicywebau/craft-tinymce.git",
   "author": "Spicy Web <plugins@spicyweb.com.au>",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "build": "./node_modules/.bin/ts-standard && ./node_modules/.bin/webpack"
   },
@@ -22,7 +22,7 @@
     "source-map-loader": "^4.0.0",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.6",
-    "tinymce": "^6.1.2",
+    "tinymce": "^7.0.0",
     "ts-loader": "^9.3.1",
     "ts-standard": "^11.0.0",
     "typescript": "^4.8.2",

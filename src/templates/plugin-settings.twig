@@ -1,3 +1,8 @@
+{#
+ # @copyright Copyright (c) 2022-2024 Spicy Web
+ # @license GPL-3.0-or-later
+ #}
+
 {% import '_includes/forms' as forms %}
 
 <div class="settings">
@@ -11,7 +16,7 @@
             { value: 'tinyCloud', label: 'Tiny Cloud'|t('tinymce') },
             { value: 'custom', label: 'Custom…'|t('app') },
         ],
-        value: settings.nonNullTinymceSource(),
+        value: settings.tinymceSource.value,
         toggle: true,
         targetPrefix: 'tinymceSource-',
     }) }}

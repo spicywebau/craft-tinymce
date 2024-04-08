@@ -1,4 +1,9 @@
 /**
+ * @copyright Copyright (c) 2022-2024 Spicy Web
+ * @license GPL-3.0-or-later
+ */
+
+/**
  * An instance of Craft.
  */
 declare const Craft: {
@@ -24,6 +29,10 @@ interface Cp {
  */
 declare interface CraftResponse {
   data: Record<any, any>
+}
+
+declare interface CraftSlideoutEvent extends Event {
+  target: any
 }
 
 declare interface CraftSlideoutEvent extends Event {
