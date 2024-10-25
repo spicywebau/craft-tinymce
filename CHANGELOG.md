@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed Craft 4 compatibility
 
+## 1.5.1 - 2024-10-25
+
+### Fixed
+- Fixed a bug when changing an entry's type, where TinyMCE fields that existed on the former entry type would not appear after the change
+
 ## 1.5.0 - 2024-04-07
 
 ### Changed

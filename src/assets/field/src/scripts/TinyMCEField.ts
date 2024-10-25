@@ -216,6 +216,7 @@ class TinyMCEField {
       }
     )
 
+    tinymce.execCommand('mceRemoveEditor', false, this._settings.id)
     tinymce.init(options).then(() => {}, () => {})
   }
 
