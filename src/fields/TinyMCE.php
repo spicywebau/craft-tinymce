@@ -46,9 +46,11 @@ use craft\elements\Entry;
 use craft\helpers\Html;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
+use craft\htmlfield\events\ModifyPurifierConfigEvent;
 use craft\htmlfield\HtmlField;
 use craft\htmlfield\HtmlFieldData;
 use craft\models\Section;
+use HTMLPurifier_Config;
 use spicyweb\tinymce\assets\FieldAsset;
 use spicyweb\tinymce\assets\TinyMCEAsset;
 use spicyweb\tinymce\enums\TinyMCESource;
@@ -66,6 +68,31 @@ use yii\base\InvalidArgumentException;
  */
 class TinyMCE extends HtmlField
 {
+    /**
+     * @since 2.1.0
+     * @event ModifyPurifierConfigEvent The event that is triggered when creating HTML Purifier config
+     *
+     * Plugins can get notified when HTML Purifier config is being constructed.
+     *
+     * ```php
+     * use craft\htmlfield\events\ModifyPurifierConfigEvent;
+     * use HTMLPurifier_Config;
+     * use spicyweb\tinymce\fields\TinyMCE;
+     * use yii\base\Event;
+     *
+     * Event::on(
+     *     TinyMCE::class,
+     *     TinyMCE::EVENT_MODIFY_PURIFIER_CONFIG,
+     *     function(ModifyPurifierConfigEvent $event) {
+     *         // @var HTMLPurifier_Config $config
+     *         $config = $event->config;
+     *         // ...
+     *     }
+     * );
+     * ```
+     */
+    public const EVENT_MODIFY_PURIFIER_CONFIG = 'modifyPurifierConfig';
+
     /**
      * @var string|null The TinyMCE config file to use
      */
@@ -308,6 +335,23 @@ class TinyMCE extends HtmlField
         }
 
         return parent::serializeValue($value, $element);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function purifierConfig(): HTMLPurifier_Config
+    {
+        $purifierConfig = parent::purifierConfig();
+
+        // Give plugins a chance to modify the HTML Purifier config, or add new ones
+        $event = new ModifyPurifierConfigEvent([
+            'config' => $purifierConfig,
+        ]);
+
+        $this->trigger(self::EVENT_MODIFY_PURIFIER_CONFIG, $event);
+
+        return $event->config;
     }
 
     private function _getLinkOptions(?ElementInterface $element = null): array
