@@ -34,7 +34,7 @@ class TinyMCEAsset extends AssetBundle
             'tinymce.min.js',
         ];
 
-        $this->_loadTranslationFile(Plugin::$plugin->language->mapLanguage(Craft::$app->language));
+        $this->_loadTranslationFile($this->_mapLanguage(Craft::$app->language));
 
         parent::init();
     }
@@ -59,6 +59,14 @@ class TinyMCEAsset extends AssetBundle
         } catch (\Exception $e) {
             // Just do nothing
         }
+    }
+
+    private function _mapLanguage(string $language): string
+    {
+        return match ($language) {
+            'fr' => 'fr_FR',
+            default => $language,
+        };
     }
 }
 
