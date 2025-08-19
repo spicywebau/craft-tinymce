@@ -38,6 +38,7 @@ namespace spicyweb\tinymce\fields;
 use Craft;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
+use craft\base\CrossSiteCopyableFieldInterface;
 use craft\base\MergeableFieldInterface;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
@@ -68,7 +69,7 @@ use yii\base\InvalidArgumentException;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0.0
  */
-class TinyMCE extends HtmlField implements MergeableFieldInterface
+class TinyMCE extends HtmlField implements CrossSiteCopyableFieldInterface, MergeableFieldInterface
 {
     /**
      * @since 2.1.0

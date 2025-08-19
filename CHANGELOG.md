@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated the distributed TinyMCE to 7.9.1
+- TinyMCE fields are now cross-site copyable
 - TinyMCE fields are now mergeable
 
 ## 2.1.1 - 2025-08-14
