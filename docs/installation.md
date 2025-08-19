@@ -18,4 +18,4 @@ Then open your project's control panel, navigate to Settings &rarr; Plugins, fin
 
 ## Requirements
 
-TinyMCE Field 2.x requires Craft CMS 5.
+TinyMCE Field 2.x requires Craft CMS 5.6.0 or later.

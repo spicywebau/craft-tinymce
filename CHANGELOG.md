@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated the distributed TinyMCE to 7.9.1
+- TinyMCE Field now requires Craft 5.6.0 or later
 - TinyMCE fields are now cross-site copyable
 - TinyMCE fields are now mergeable
 
