@@ -37,6 +37,8 @@ namespace spicyweb\tinymce\fields;
 
 use Craft;
 use craft\base\ElementInterface;
+use craft\base\FieldInterface;
+use craft\base\MergeableFieldInterface;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\Plugin as Commerce;
@@ -66,7 +68,7 @@ use yii\base\InvalidArgumentException;
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0.0
  */
-class TinyMCE extends HtmlField
+class TinyMCE extends HtmlField implements MergeableFieldInterface
 {
     /**
      * @since 2.1.0
@@ -335,6 +337,19 @@ class TinyMCE extends HtmlField
         }
 
         return parent::serializeValue($value, $element);
+    }
+
+    /**
+     * @innheritdoc
+     */
+    public function canMergeInto(FieldInterface $persistingField, ?string &$reason): bool
+    {
+        if (!$persistingField instanceof self) {
+            $reason = 'TinyMCE fields can only be merged into other TinyMCE fields.';
+            return false;
+        }
+
+        return true;
     }
 
     /**
