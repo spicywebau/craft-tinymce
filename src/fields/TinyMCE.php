@@ -261,12 +261,12 @@ class TinyMCE extends HtmlField
 
                 break;
             case TinyMCESource::TinyCloud:
-                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/tinymce.min.js", [
+                $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/7/tinymce.min.js", [
                     'referrerpolicy' => 'origin',
                 ]);
 
                 if ($pluginSettings->enablePremiumPlugins) {
-                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/7/plugins.min.js", [
                         'referrerpolicy' => 'origin',
                     ]);
                 }
@@ -283,7 +283,7 @@ class TinyMCE extends HtmlField
                 ]);
 
                 if ($pluginSettings->enablePremiumPlugins) {
-                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/6/plugins.min.js", [
+                    $view->registerJsFile("https://cdn.tiny.cloud/1/{$apiKey}/tinymce/7/plugins.min.js", [
                         'referrerpolicy' => 'origin',
                     ]);
                 }

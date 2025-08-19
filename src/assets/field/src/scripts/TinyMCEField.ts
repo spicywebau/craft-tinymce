@@ -137,7 +137,7 @@ class TinyMCEField {
         fix_list_elements: true,
         // Copying in the entire default `style_formats` here to add mark option to inline submenu,
         // because using `style_formats_merge` to merge options into submenus doesn't work
-        // Source for defaults: https://www.tiny.cloud/docs/tinymce/6/user-formatting-options/#style_formats
+        // Source for defaults: https://www.tiny.cloud/docs/tinymce/7/user-formatting-options/#style_formats
         style_formats: [
           {
             title: 'Headings',
