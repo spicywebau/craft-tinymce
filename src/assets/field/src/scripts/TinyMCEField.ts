@@ -190,7 +190,7 @@ class TinyMCEField {
         anchor_bottom: false,
 
         // Auto-resize
-        autoresize_bottom_margin: 0
+        autoresize_bottom_margin: 1
       },
       this._settings.editorConfig,
       {
